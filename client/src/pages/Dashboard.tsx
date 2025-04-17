@@ -5,6 +5,7 @@ import AICFOAssistant from "@/components/dashboard/AICFOAssistant";
 import ConnectedServices from "@/components/dashboard/ConnectedServices";
 import RecentTransactions from "@/components/dashboard/RecentTransactions";
 import FinancialTasks from "@/components/dashboard/FinancialTasks";
+import ChargeAutomation from "@/components/dashboard/ChargeAutomation";
 import { formatDate } from "@/lib/utils";
 
 export default function Dashboard() {
@@ -18,7 +19,7 @@ export default function Dashboard() {
       {/* Page Header */}
       <div className="px-4 sm:px-6 md:px-8">
         <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-          Financial Dashboard
+          Chitty Services CFO Dashboard
         </h1>
         
         <div className="mt-2 flex items-center text-sm text-gray-500 dark:text-gray-400">
@@ -47,6 +48,11 @@ export default function Dashboard() {
         {/* Integrations Section */}
         <div className="mt-8">
           <ConnectedServices />
+        </div>
+        
+        {/* Charge Automation Section */}
+        <div className="mt-8">
+          <ChargeAutomation />
         </div>
 
         {/* Recent Transactions and Tasks */}

@@ -10,6 +10,16 @@ export default function Header() {
     <header className="relative z-10 flex flex-shrink-0 h-16 bg-white dark:bg-gray-800 shadow-sm">
       <div className="flex justify-between flex-1 px-4">
         <div className="flex flex-1 items-center">
+          {/* Chitty Services Logo */}
+          <div className="flex items-center mr-6">
+            <img 
+              src="/assets/SERVICES.png" 
+              alt="Chitty Services Logo" 
+              className="h-10 w-auto"
+            />
+            <span className="ml-2 text-lg font-bold text-gray-900 dark:text-white">Chitty Services</span>
+          </div>
+          
           <div className="flex w-full md:ml-0">
             <div className="relative w-full text-gray-500 focus-within:text-gray-600">
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
