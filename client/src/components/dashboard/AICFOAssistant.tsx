@@ -51,39 +51,40 @@ export default function AICFOAssistant() {
   const isLoading2 = sendQueryMutation.isPending || generatePlanMutation.isPending;
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="pb-3 border-b border-gray-200 dark:border-gray-700">
+    <Card className="card">
+      <CardHeader className="card-header">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-medium">AI CFO Assistant</CardTitle>
-          <Badge className="bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+          <CardTitle className="text-lg font-medium text-lime-400">AI CFO Assistant</CardTitle>
+          <Badge className="bg-lime-400 text-black font-medium">
             Active
           </Badge>
         </div>
       </CardHeader>
       
       <CardContent className="p-5">
-        <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+        <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
           <div className="flex items-start space-x-4">
             <div className="flex-shrink-0">
-              <div className="bg-primary rounded-full h-10 w-10 flex items-center justify-center">
-                <Lightbulb className="h-6 w-6 text-white" />
+              <div className="bg-zinc-900 border border-lime-500/20 rounded-full h-10 w-10 flex items-center justify-center">
+                <Lightbulb className="h-6 w-6 text-lime-400" />
               </div>
             </div>
             <div className="min-w-0 flex-1">
               {isLoading ? (
                 <div className="space-y-2">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-5/6" />
+                  <Skeleton className="h-4 w-3/4 bg-zinc-800" />
+                  <Skeleton className="h-4 w-full bg-zinc-800" />
+                  <Skeleton className="h-4 w-5/6 bg-zinc-800" />
                 </div>
               ) : (
-                <p className="text-sm text-gray-700 dark:text-gray-300">
-                  <span className="font-medium text-gray-900 dark:text-white">AI CFO: </span>
+                <p className="text-sm text-zinc-300">
+                  <span className="font-medium text-lime-400">AI CFO: </span>
                   <span>{aiMessage?.content}</span>
                 </p>
               )}
               <div className="mt-4 flex flex-wrap gap-2">
                 <Button
+                  className="bg-lime-400 text-black hover:bg-lime-500 transition-colors"
                   disabled={isLoading2}
                   onClick={() => generatePlanMutation.mutate()}
                 >
@@ -91,6 +92,7 @@ export default function AICFOAssistant() {
                 </Button>
                 <Button
                   variant="outline"
+                  className="border-lime-500 text-zinc-200 hover:bg-zinc-800 hover:text-lime-400 transition-colors"
                   disabled={isLoading2}
                   onClick={() => setQuery("What are my options for improving cash flow?")}
                 >
@@ -103,7 +105,7 @@ export default function AICFOAssistant() {
         
         <div className="mt-4">
           <form onSubmit={handleSubmit}>
-            <label htmlFor="query" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label htmlFor="query" className="block text-sm font-medium text-lime-400">
               Ask your AI CFO
             </label>
             <div className="mt-1 flex rounded-md shadow-sm">
@@ -113,13 +115,13 @@ export default function AICFOAssistant() {
                 id="query"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="flex-1 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="flex-1 block w-full rounded-none rounded-l-md sm:text-sm border-zinc-700 bg-zinc-800 text-zinc-200 focus:border-lime-500"
                 placeholder="Ask about financial projections, cost savings, or investment opportunities..."
                 disabled={isLoading2}
               />
               <Button
                 type="submit"
-                className="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 rounded-r-md"
+                className="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 rounded-r-md bg-lime-400 text-black hover:bg-lime-500"
                 disabled={isLoading2 || !query.trim()}
               >
                 <SendHorizontal className="h-5 w-5" />
