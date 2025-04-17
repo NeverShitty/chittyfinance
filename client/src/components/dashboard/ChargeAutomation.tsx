@@ -290,19 +290,21 @@ export default function ChargeAutomation() {
       
       {/* Cancel Subscription Dialog */}
       <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-zinc-900 border border-zinc-700">
           <AlertDialogHeader>
-            <AlertDialogTitle>Cancel Subscription</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-lime-400">Cancel Subscription</AlertDialogTitle>
+            <AlertDialogDescription className="text-zinc-300">
               Are you sure you want to cancel your subscription to {selectedCharge?.merchantName}? 
               This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="bg-zinc-800 text-zinc-300 border-zinc-700 hover:bg-zinc-700 hover:text-zinc-200">
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction 
               onClick={confirmCancelSubscription}
-              className="bg-red-500 hover:bg-red-600 text-white"
+              className="bg-red-900 hover:bg-red-800 text-red-200 border border-red-700"
             >
               Yes, Cancel Subscription
             </AlertDialogAction>
