@@ -16,7 +16,14 @@ export default function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   // Query user data
-  const { data: user } = useQuery({
+  const { data: user } = useQuery<{
+    id: number;
+    username: string;
+    displayName: string;
+    email: string;
+    role: string;
+    avatar: string | null;
+  }>({
     queryKey: ["/api/session"],
   });
 
@@ -54,8 +61,16 @@ export default function Sidebar() {
         )}
       >
         <div className="flex flex-col w-64 h-full border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-          <div className="flex items-center justify-center h-16 px-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-primary dark:text-blue-400">AI CFO Platform</h2>
+          <div className="flex items-center h-16 px-4 border-b border-gray-200 dark:border-gray-700">
+            <img 
+              src="/assets/SERVICES.png" 
+              alt="Chitty Services Logo" 
+              className="h-10 w-auto"
+            />
+            <div className="ml-2">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">Chitty Services</h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400">AI CFO Assistant</p>
+            </div>
           </div>
           
           <div className="flex flex-col flex-grow pt-5 overflow-y-auto">
