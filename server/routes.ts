@@ -5,6 +5,7 @@ import { z } from "zod";
 import { insertAiMessageSchema, insertIntegrationSchema, insertTaskSchema } from "@shared/schema";
 import { getFinancialAdvice, generateCostReductionPlan } from "./lib/openai";
 import { getAggregatedFinancialData } from "./lib/financialServices";
+import { getRecurringCharges, getChargeOptimizations, manageRecurringCharge } from "./lib/chargeAutomation";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Create API router
@@ -278,6 +279,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Cost reduction plan generation error:", error);
       res.status(500).json({ message: "Failed to generate cost reduction plan" });
+    }
+  });
+
+  // Charge Automation Routes
+  
+  // Get recurring charges
+  api.get("/charges/recurring", async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserByUsername("demo");
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const charges = await getRecurringCharges(user.id);
+      res.json(charges);
+    } catch (error) {
+      console.error("Error fetching recurring charges:", error);
+      res.status(500).json({ message: "Failed to fetch recurring charges" });
+    }
+  });
+  
+  // Get charge optimization recommendations
+  api.get("/charges/optimizations", async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserByUsername("demo");
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const optimizations = await getChargeOptimizations(user.id);
+      res.json(optimizations);
+    } catch (error) {
+      console.error("Error generating charge optimizations:", error);
+      res.status(500).json({ message: "Failed to generate charge optimizations" });
+    }
+  });
+  
+  // Cancel or modify a recurring charge
+  api.post("/charges/manage", async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserByUsername("demo");
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { chargeId, action, modifications } = req.body;
+      
+      if (!chargeId || !action) {
+        return res.status(400).json({ message: "chargeId and action are required" });
+      }
+      
+      if (action !== 'cancel' && action !== 'modify') {
+        return res.status(400).json({ message: "action must be 'cancel' or 'modify'" });
+      }
+      
+      const result = await manageRecurringCharge(user.id, chargeId, action, modifications);
+      res.json(result);
+    } catch (error) {
+      console.error("Error managing recurring charge:", error);
+      res.status(500).json({ message: "Failed to manage recurring charge" });
     }
   });
 

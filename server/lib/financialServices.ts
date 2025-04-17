@@ -127,8 +127,11 @@ export async function getAggregatedFinancialData(integrations: Integration[]): P
       case 'mercury_bank':
         serviceData = await fetchMercuryBankData(integration);
         break;
-      case 'wave_accounting':
-        serviceData = await fetchWaveAccountingData(integration);
+      case 'wavapps':
+        serviceData = await fetchWavAppsData(integration);
+        break;
+      case 'doorloop':
+        serviceData = await fetchDoorLoopData(integration);
         break;
       default:
         console.log(`No handler for service type: ${integration.serviceType}`);
