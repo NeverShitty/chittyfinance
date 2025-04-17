@@ -60,16 +60,16 @@ export default function Sidebar() {
           mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
-        <div className="flex flex-col w-64 h-full border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-          <div className="flex items-center h-16 px-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex flex-col w-64 h-full border-r border-zinc-800 bg-zinc-900">
+          <div className="flex items-center h-16 px-4 border-b border-zinc-800">
             <img 
               src="/assets/SERVICES.png" 
               alt="Chitty Services Logo" 
               className="h-10 w-auto"
             />
             <div className="ml-2">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">Chitty Services</h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400">AI CFO Assistant</p>
+              <h2 className="text-lg font-bold gradient-text">Chitty Services</h2>
+              <p className="text-xs text-zinc-400">AI CFO Assistant</p>
             </div>
           </div>
           
@@ -99,20 +99,20 @@ export default function Sidebar() {
           </div>
           
           {user && (
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="p-4 border-t border-zinc-800">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <img 
-                    className="w-10 h-10 rounded-full" 
+                    className="w-10 h-10 rounded-full border-2 border-lime-500" 
                     src={user.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"} 
                     alt="User avatar"
                   />
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <p className="text-sm font-medium text-zinc-200">
                     {user.displayName}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-lime-400">
                     {user.role}
                   </p>
                 </div>
@@ -137,13 +137,13 @@ function NavItem({ href, icon, active, children }: NavItemProps) {
     <Link href={href}>
       <a
         className={cn(
-          "flex items-center px-4 py-2 text-sm font-medium rounded-md group",
+          "flex items-center px-4 py-2 text-sm font-medium rounded-md group transition-all duration-200",
           active
-            ? "text-white bg-primary"
-            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+            ? "text-black bg-lime-400"
+            : "text-zinc-300 hover:text-lime-400 hover:bg-zinc-800"
         )}
       >
-        <span className={cn("w-5 h-5 mr-3", active ? "text-white" : "text-gray-500 dark:text-gray-400")}>
+        <span className={cn("w-5 h-5 mr-3", active ? "text-black" : "text-zinc-500 group-hover:text-lime-400")}>
           {icon}
         </span>
         {children}

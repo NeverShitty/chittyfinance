@@ -8,6 +8,53 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased bg-zinc-950 text-zinc-50;
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-lime-400 to-emerald-400;
+  }
+  
+  .card {
+    @apply bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-lg;
+  }
+  
+  .card-header {
+    @apply border-b border-zinc-800 p-4 font-medium text-lime-400;
+  }
+  
+  .card-content {
+    @apply p-4;
+  }
+  
+  .pulse-connection {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: theme('colors.zinc.900');
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: theme('colors.zinc.700');
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: theme('colors.lime.500');
   }
 }
