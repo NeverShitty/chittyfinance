@@ -135,9 +135,9 @@ type NavItemProps = {
 function NavItem({ href, icon, active, children }: NavItemProps) {
   return (
     <Link href={href}>
-      <a
+      <div
         className={cn(
-          "flex items-center px-4 py-2 text-sm font-medium rounded-md group transition-all duration-200",
+          "flex items-center px-4 py-2 text-sm font-medium rounded-md group transition-all duration-200 cursor-pointer",
           active
             ? "text-black bg-lime-400"
             : "text-zinc-300 hover:text-lime-400 hover:bg-zinc-800"
@@ -147,7 +147,7 @@ function NavItem({ href, icon, active, children }: NavItemProps) {
           {icon}
         </span>
         {children}
-      </a>
+      </div>
     </Link>
   );
 }
