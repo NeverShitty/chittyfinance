@@ -63,7 +63,7 @@ export default function Sidebar() {
         <div className="flex flex-col w-64 h-full border-r border-zinc-800 bg-zinc-900">
           <div className="flex items-center h-16 px-4 border-b border-zinc-800">
             <img 
-              src="/assets/SERVICES.png" 
+              src="/images/SERVICES.png" 
               alt="Chitty Services Logo" 
               className="h-10 w-auto"
             />
