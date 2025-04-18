@@ -6,6 +6,12 @@ import { insertAiMessageSchema, insertIntegrationSchema, insertTaskSchema } from
 import { getFinancialAdvice, generateCostReductionPlan } from "./lib/openai";
 import { getAggregatedFinancialData } from "./lib/financialServices";
 import { getRecurringCharges, getChargeOptimizations, manageRecurringCharge } from "./lib/chargeAutomation";
+import { 
+  fetchUserRepositories, 
+  fetchRepositoryCommits, 
+  fetchRepositoryPullRequests, 
+  fetchRepositoryIssues 
+} from "./lib/github";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Create API router
@@ -339,6 +345,131 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error managing recurring charge:", error);
       res.status(500).json({ message: "Failed to manage recurring charge" });
+    }
+  });
+
+  // GitHub Integration Routes
+  
+  // Get GitHub repositories
+  api.get("/github/repositories", async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserByUsername("demo");
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get GitHub integration
+      const integrations = await storage.getIntegrations(user.id);
+      const githubIntegration = integrations.find(i => i.serviceType === "github");
+      
+      if (!githubIntegration) {
+        // For demo purposes, create a GitHub integration if it doesn't exist
+        const newIntegration = await storage.createIntegration({
+          userId: user.id,
+          serviceType: "github",
+          name: "GitHub",
+          description: "Source Code & Development",
+          connected: true,
+          lastSynced: new Date(),
+          credentials: {}
+        });
+        
+        const repositories = await fetchUserRepositories(newIntegration);
+        return res.json(repositories);
+      }
+      
+      const repositories = await fetchUserRepositories(githubIntegration);
+      res.json(repositories);
+    } catch (error) {
+      console.error("Error fetching GitHub repositories:", error);
+      res.status(500).json({ message: "Failed to fetch GitHub repositories" });
+    }
+  });
+  
+  // Get GitHub repository commits
+  api.get("/github/repositories/:repoFullName/commits", async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserByUsername("demo");
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { repoFullName } = req.params;
+      if (!repoFullName) {
+        return res.status(400).json({ message: "Repository name is required" });
+      }
+      
+      // Get GitHub integration
+      const integrations = await storage.getIntegrations(user.id);
+      const githubIntegration = integrations.find(i => i.serviceType === "github");
+      
+      if (!githubIntegration) {
+        return res.status(404).json({ message: "GitHub integration not found" });
+      }
+      
+      const commits = await fetchRepositoryCommits(githubIntegration, repoFullName);
+      res.json(commits);
+    } catch (error) {
+      console.error(`Error fetching commits for ${req.params.repoFullName}:`, error);
+      res.status(500).json({ message: "Failed to fetch repository commits" });
+    }
+  });
+  
+  // Get GitHub repository pull requests
+  api.get("/github/repositories/:repoFullName/pulls", async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserByUsername("demo");
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { repoFullName } = req.params;
+      if (!repoFullName) {
+        return res.status(400).json({ message: "Repository name is required" });
+      }
+      
+      // Get GitHub integration
+      const integrations = await storage.getIntegrations(user.id);
+      const githubIntegration = integrations.find(i => i.serviceType === "github");
+      
+      if (!githubIntegration) {
+        return res.status(404).json({ message: "GitHub integration not found" });
+      }
+      
+      const pullRequests = await fetchRepositoryPullRequests(githubIntegration, repoFullName);
+      res.json(pullRequests);
+    } catch (error) {
+      console.error(`Error fetching pull requests for ${req.params.repoFullName}:`, error);
+      res.status(500).json({ message: "Failed to fetch repository pull requests" });
+    }
+  });
+  
+  // Get GitHub repository issues
+  api.get("/github/repositories/:repoFullName/issues", async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserByUsername("demo");
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { repoFullName } = req.params;
+      if (!repoFullName) {
+        return res.status(400).json({ message: "Repository name is required" });
+      }
+      
+      // Get GitHub integration
+      const integrations = await storage.getIntegrations(user.id);
+      const githubIntegration = integrations.find(i => i.serviceType === "github");
+      
+      if (!githubIntegration) {
+        return res.status(404).json({ message: "GitHub integration not found" });
+      }
+      
+      const issues = await fetchRepositoryIssues(githubIntegration, repoFullName);
+      res.json(issues);
+    } catch (error) {
+      console.error(`Error fetching issues for ${req.params.repoFullName}:`, error);
+      res.status(500).json({ message: "Failed to fetch repository issues" });
     }
   });
 
