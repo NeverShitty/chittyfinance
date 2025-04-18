@@ -6,6 +6,7 @@ import ConnectedServices from "@/components/dashboard/ConnectedServices";
 import RecentTransactions from "@/components/dashboard/RecentTransactions";
 import FinancialTasks from "@/components/dashboard/FinancialTasks";
 import ChargeAutomation from "@/components/dashboard/ChargeAutomation";
+import GitHubRepositories from "@/components/dashboard/GitHubRepositories";
 import { formatDate } from "@/lib/utils";
 
 export default function Dashboard() {
@@ -53,6 +54,11 @@ export default function Dashboard() {
         {/* Charge Automation Section */}
         <div className="mt-8">
           <ChargeAutomation />
+        </div>
+
+        {/* GitHub Repositories Section */}
+        <div className="mt-8">
+          <GitHubRepositories />
         </div>
 
         {/* Recent Transactions and Tasks */}
