@@ -189,28 +189,33 @@ function RepoCard({ repo }: { repo: GitHubRepo }) {
               </div>
             ) : commits && commits.length > 0 ? (
               <div className="space-y-2">
-                {commits.map((commit: GitHubCommit) => (
-                  <a 
-                    key={commit.id} 
-                    href={commit.url} 
-                    target="_blank"
-                    rel="noreferrer"
-                    className="block p-2 rounded bg-zinc-900/50 hover:bg-zinc-900 transition-colors"
-                  >
-                    <div className="flex justify-between items-start gap-2">
-                      <div className="text-xs font-medium text-zinc-300 truncate">
-                        {commit.message.split('\n')[0]}
+                {commits && commits.map((commit: GitHubCommit) => {
+                  // Safely handle potentially undefined properties
+                  const message = commit.message || "";
+                  const firstLine = message.includes('\n') ? message.split('\n')[0] : message;
+                  return (
+                    <a 
+                      key={commit.id} 
+                      href={commit.url} 
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block p-2 rounded bg-zinc-900/50 hover:bg-zinc-900 transition-colors"
+                    >
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="text-xs font-medium text-zinc-300 truncate">
+                          {firstLine}
+                        </div>
+                        <div className="text-xs text-zinc-500 whitespace-nowrap flex-shrink-0">
+                          {formatTimeAgo(new Date(commit.date))}
+                        </div>
                       </div>
-                      <div className="text-xs text-zinc-500 whitespace-nowrap flex-shrink-0">
-                        {formatTimeAgo(new Date(commit.date))}
+                      <div className="text-xs text-zinc-500 mt-1 flex items-center gap-1">
+                        <GitBranch className="w-3 h-3" /> 
+                        {commit.author}
                       </div>
-                    </div>
-                    <div className="text-xs text-zinc-500 mt-1 flex items-center gap-1">
-                      <GitBranch className="w-3 h-3" /> 
-                      {commit.author}
-                    </div>
-                  </a>
-                ))}
+                    </a>
+                  );
+                })}
               </div>
             ) : (
               <div className="text-center text-zinc-500 py-4 text-xs">No commits found</div>
@@ -223,7 +228,7 @@ function RepoCard({ repo }: { repo: GitHubRepo }) {
               </div>
             ) : pullRequests && pullRequests.length > 0 ? (
               <div className="space-y-2">
-                {pullRequests.map((pr: GitHubPullRequest) => (
+                {pullRequests && pullRequests.map((pr: GitHubPullRequest) => (
                   <a 
                     key={pr.id} 
                     href={pr.url} 
@@ -264,7 +269,7 @@ function RepoCard({ repo }: { repo: GitHubRepo }) {
               </div>
             ) : issues && issues.length > 0 ? (
               <div className="space-y-2">
-                {issues.map((issue: GitHubIssue) => (
+                {issues && issues.map((issue: GitHubIssue) => (
                   <a 
                     key={issue.id} 
                     href={issue.url} 
@@ -289,7 +294,7 @@ function RepoCard({ repo }: { repo: GitHubRepo }) {
                     <div className="text-xs text-zinc-500 mt-1">
                       #{issue.id} by {issue.author}
                     </div>
-                    {issue.labels.length > 0 && (
+                    {issue.labels && issue.labels.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-1">
                         {issue.labels.slice(0, 3).map((label, idx) => (
                           <Badge key={idx} variant="outline" className="px-1 py-0 text-[10px] border-zinc-700 text-zinc-400">
