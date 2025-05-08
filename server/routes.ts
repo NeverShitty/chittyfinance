@@ -12,6 +12,7 @@ import {
   fetchRepositoryPullRequests, 
   fetchRepositoryIssues 
 } from "./lib/github";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 
 // Function to seed new integrations for the demo user
 async function seedNewIntegrations() {
@@ -72,6 +73,9 @@ async function seedNewIntegrations() {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup Replit Auth
+  await setupAuth(app);
+  
   // Seed new integrations
   await seedNewIntegrations();
   
