@@ -12,6 +12,7 @@ import {
   fetchRepositoryPullRequests, 
   fetchRepositoryIssues 
 } from "./lib/github";
+import { transformToUniversalFormat } from "./lib/universalConnector";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 
 // Function to seed new integrations for the demo user
@@ -671,6 +672,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         success: false,
         message: `Failed to test platform: ${error.message}`
+      });
+    }
+  });
+
+  // Universal Connector endpoint
+  api.get("/universal-connector", async (req: Request, res: Response) => {
+    try {
+      // In a real app, we would get the user ID from the session
+      // Here we use the demo user
+      const user = await storage.getUserByUsername("demo");
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get all integrations to fetch data from
+      const integrations = await storage.getIntegrations(user.id);
+      
+      // Transform the data into universal format
+      const universalData = await transformToUniversalFormat(user.id, integrations);
+      
+      res.json(universalData);
+    } catch (error: any) {
+      console.error("Error generating universal connector data:", error);
+      res.status(500).json({ 
+        success: false,
+        message: `Universal Connector Error: ${error.message}`
+      });
+    }
+  });
+  
+  // Test endpoint for Universal Connector with authentication
+  api.get("/universal-connector/secured", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const user = req.user as any;
+      const userId = user.claims.sub;
+      
+      // Get the user from our database
+      const dbUser = await storage.getUserByUsername("demo"); // For demo, we'll use the demo user
+      if (!dbUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get all integrations to fetch data from
+      const integrations = await storage.getIntegrations(dbUser.id);
+      
+      // Transform the data into universal format
+      const universalData = await transformToUniversalFormat(dbUser.id, integrations);
+      
+      // Add authenticated user info
+      universalData.authInfo = {
+        authenticatedUserId: userId,
+        authenticatedAt: new Date().toISOString(),
+        authMethod: "replit_auth"
+      };
+      
+      res.json(universalData);
+    } catch (error: any) {
+      console.error("Error generating authenticated universal connector data:", error);
+      res.status(500).json({ 
+        success: false,
+        message: `Universal Connector Error: ${error.message}`
       });
     }
   });
