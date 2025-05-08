@@ -13,7 +13,68 @@ import {
   fetchRepositoryIssues 
 } from "./lib/github";
 
+// Function to seed new integrations for the demo user
+async function seedNewIntegrations() {
+  try {
+    const user = await storage.getUserByUsername("demo");
+    if (!user) return;
+    
+    const existingIntegrations = await storage.getIntegrations(user.id);
+    const existingServiceTypes = new Set(existingIntegrations.map(i => i.serviceType));
+    
+    // New integrations to add if they don't exist
+    const newIntegrations = [
+      {
+        serviceType: 'stripe',
+        name: 'Stripe',
+        description: 'Payment processing platform',
+        connected: true
+      },
+      {
+        serviceType: 'quickbooks',
+        name: 'QuickBooks',
+        description: 'Accounting software',
+        connected: true
+      },
+      {
+        serviceType: 'xero',
+        name: 'Xero',
+        description: 'International accounting platform',
+        connected: true
+      },
+      {
+        serviceType: 'brex',
+        name: 'Brex',
+        description: 'Business credit cards & expense management',
+        connected: true
+      },
+      {
+        serviceType: 'gusto',
+        name: 'Gusto',
+        description: 'Payroll, benefits, and HR',
+        connected: true
+      }
+    ];
+    
+    // Add any missing integrations
+    for (const integration of newIntegrations) {
+      if (!existingServiceTypes.has(integration.serviceType)) {
+        await storage.createIntegration({
+          ...integration,
+          userId: user.id,
+          lastSynced: new Date()
+        });
+      }
+    }
+  } catch (error) {
+    console.error("Error seeding new integrations:", error);
+  }
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Seed new integrations
+  await seedNewIntegrations();
+  
   // Create API router
   const api = express.Router();
 
@@ -40,22 +101,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Get financial summary
-    let summary = await storage.getFinancialSummary(user.id);
-
-    if (!summary) {
-      // If no summary exists, we'd typically fetch from external services
-      // For demo, create a new summary record
-      summary = await storage.createFinancialSummary({
-        userId: user.id,
-        cashOnHand: 127842.50,
-        monthlyRevenue: 43291.75,
-        monthlyExpenses: 26142.30,
-        outstandingInvoices: 18520.00,
-      });
+    try {
+      // Get all integrations to fetch data from
+      const integrations = await storage.getIntegrations(user.id);
+      
+      // Get aggregated financial data from all connected services
+      const financialData = await getAggregatedFinancialData(integrations);
+      
+      // Update or create summary in database
+      let summary = await storage.getFinancialSummary(user.id);
+      
+      if (summary) {
+        // Update existing summary with latest data
+        summary = await storage.updateFinancialSummary(user.id, {
+          cashOnHand: financialData.cashOnHand,
+          monthlyRevenue: financialData.monthlyRevenue,
+          monthlyExpenses: financialData.monthlyExpenses,
+          outstandingInvoices: financialData.outstandingInvoices
+        });
+      } else {
+        // Create new summary
+        summary = await storage.createFinancialSummary({
+          userId: user.id,
+          cashOnHand: financialData.cashOnHand,
+          monthlyRevenue: financialData.monthlyRevenue,
+          monthlyExpenses: financialData.monthlyExpenses,
+          outstandingInvoices: financialData.outstandingInvoices
+        });
+      }
+      
+      // Add metrics and payroll data for the response
+      const enhancedSummary = {
+        ...summary,
+        metrics: financialData.metrics,
+        payroll: financialData.payroll
+      };
+      
+      res.json(enhancedSummary);
+    } catch (error) {
+      console.error("Error fetching financial summary:", error);
+      
+      // Fall back to existing database record if there's an error
+      let summary = await storage.getFinancialSummary(user.id);
+      
+      if (!summary) {
+        // If no summary exists, create a basic one
+        summary = await storage.createFinancialSummary({
+          userId: user.id,
+          cashOnHand: 127842.50,
+          monthlyRevenue: 43291.75,
+          monthlyExpenses: 26142.30,
+          outstandingInvoices: 18520.00,
+        });
+      }
+      
+      res.json(summary);
     }
-
-    res.json(summary);
   });
 
   // Get integrations
@@ -115,10 +216,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
-    const transactions = await storage.getTransactions(user.id, limit);
-    
-    res.json(transactions);
+    try {
+      // Get integrations to fetch live transaction data
+      const integrations = await storage.getIntegrations(user.id);
+      
+      // Get aggregated financial data which includes transactions
+      const financialData = await getAggregatedFinancialData(integrations);
+      
+      // Return transactions from financial data if available
+      if (financialData.transactions && financialData.transactions.length > 0) {
+        const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+        const limitedTransactions = limit ? 
+          financialData.transactions.slice(0, limit) : 
+          financialData.transactions;
+        
+        return res.json(limitedTransactions);
+      }
+      
+      // Fallback to database if no live transactions
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      const transactions = await storage.getTransactions(user.id, limit);
+      
+      res.json(transactions);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      
+      // Fallback to database on error
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      const transactions = await storage.getTransactions(user.id, limit);
+      
+      res.json(transactions);
+    }
   });
 
   // Get tasks
