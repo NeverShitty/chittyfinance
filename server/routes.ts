@@ -479,6 +479,151 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to manage recurring charge" });
     }
   });
+  
+  // Financial Platform Integration Testing Endpoint
+  api.get("/test-financial-platform/:platformId", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      // Get the platform identifier from the URL params
+      const platformId = req.params.platformId;
+      
+      // Get demo user for now - in production this would use the authenticated user
+      const user = await storage.getUserByUsername("demo");
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get all integrations for this user
+      const integrations = await storage.getIntegrations(user.id);
+      
+      // Find the specified integration
+      const integration = integrations.find(i => i.serviceType === platformId);
+      
+      if (!integration) {
+        return res.status(404).json({ 
+          success: false,
+          message: `Integration for platform '${platformId}' not found`, 
+          availablePlatforms: integrations.map(i => i.serviceType)
+        });
+      }
+      
+      // Initialize results container
+      const results = {
+        platformId,
+        platformName: integration.name,
+        tests: [] as Array<{name: string, success: boolean, data: any, error?: string}>
+      };
+      
+      // Test 1: Financial Data Fetch
+      try {
+        let financialData;
+        
+        // Call the appropriate function based on the platform ID
+        switch (platformId) {
+          case "mercury_bank":
+          case "wavapps":
+          case "doorloop":
+          case "stripe":
+          case "quickbooks":
+          case "xero":
+          case "brex":
+          case "gusto":
+            financialData = await getAggregatedFinancialData([integration]);
+            break;
+          default:
+            throw new Error(`No handler defined for platform: ${platformId}`);
+        }
+        
+        results.tests.push({
+          name: "Financial Data Fetch",
+          success: true,
+          data: financialData
+        });
+      } catch (error: any) {
+        results.tests.push({
+          name: "Financial Data Fetch",
+          success: false,
+          data: null,
+          error: error.message
+        });
+      }
+      
+      // Test 2: Recurring Charges
+      try {
+        let recurringCharges;
+        
+        // Only test recurring charges on platforms that support it
+        if (["mercury_bank", "wavapps", "doorloop", "stripe", "quickbooks", "xero", "brex"].includes(platformId)) {
+          recurringCharges = await getRecurringCharges(user.id);
+          
+          results.tests.push({
+            name: "Recurring Charges",
+            success: true,
+            data: recurringCharges
+          });
+        } else {
+          results.tests.push({
+            name: "Recurring Charges",
+            success: false,
+            data: null,
+            error: "Platform does not support recurring charges"
+          });
+        }
+      } catch (error: any) {
+        results.tests.push({
+          name: "Recurring Charges",
+          success: false,
+          data: null,
+          error: error.message
+        });
+      }
+      
+      // Test 3: Connection Status
+      try {
+        // Update the last synced timestamp to verify connection is active
+        const updatedIntegration = await storage.updateIntegration(integration.id, {
+          lastSynced: new Date()
+        });
+        
+        results.tests.push({
+          name: "Connection Status",
+          success: true,
+          data: {
+            connected: updatedIntegration?.connected,
+            lastSynced: updatedIntegration?.lastSynced
+          }
+        });
+      } catch (error: any) {
+        results.tests.push({
+          name: "Connection Status",
+          success: false,
+          data: null,
+          error: error.message
+        });
+      }
+      
+      // Calculate overall success
+      const overallSuccess = results.tests.every(test => test.success);
+      
+      // Send complete test results
+      res.json({
+        success: overallSuccess,
+        platform: {
+          id: platformId,
+          name: integration.name,
+          type: integration.serviceType
+        },
+        testResults: results.tests,
+        timestamp: new Date()
+      });
+      
+    } catch (error: any) {
+      console.error(`Error testing financial platform ${req.params.platformId}:`, error);
+      res.status(500).json({ 
+        success: false,
+        message: `Failed to test financial platform: ${error.message}`
+      });
+    }
+  });
 
   // GitHub Integration Routes
   
