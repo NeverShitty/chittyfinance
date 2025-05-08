@@ -13,7 +13,9 @@ export interface IStorage {
   // User operations
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, data: Partial<User>): Promise<User | undefined>;
 
   // Integration operations
   getIntegrations(userId: number): Promise<Integration[]>;
@@ -52,6 +54,11 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db.select().from(users).where(eq(users.username, username));
     return user || undefined;
   }
+  
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const [user] = await db
@@ -59,6 +66,15 @@ export class DatabaseStorage implements IStorage {
       .values(insertUser)
       .returning();
     return user;
+  }
+  
+  async updateUser(id: number, data: Partial<User>): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set(data)
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
   }
 
   // Integration operations
