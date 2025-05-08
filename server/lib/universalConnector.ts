@@ -19,6 +19,11 @@ export interface UniversalConnectorPayload {
   timestamp: string;
   source: string;
   accountId: string | number;
+  authInfo?: {
+    authenticatedUserId: string;
+    authenticatedAt: string;
+    authMethod: string;
+  };
   data: {
     summary: {
       cashOnHand: number;
