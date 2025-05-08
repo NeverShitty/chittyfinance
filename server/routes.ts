@@ -481,7 +481,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Financial Platform Integration Testing Endpoint
-  api.get("/test-financial-platform/:platformId", isAuthenticated, async (req: Request, res: Response) => {
+  api.get("/test-financial-platform/:platformId", async (req: Request, res: Response) => {
     try {
       // Get the platform identifier from the URL params
       const platformId = req.params.platformId;
@@ -625,7 +625,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GitHub Integration Routes
+  // Test endpoint for financial platform integration (without authentication)
+  api.get("/test-platform/:platformId", async (req: Request, res: Response) => {
+    try {
+      // Get the platform identifier from the URL params
+      const platformId = req.params.platformId;
+      
+      // Get demo user 
+      const user = await storage.getUserByUsername("demo");
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get all integrations for this user
+      const integrations = await storage.getIntegrations(user.id);
+      
+      // Find the specified integration
+      const integration = integrations.find(i => i.serviceType === platformId);
+      
+      if (!integration) {
+        return res.status(404).json({ 
+          success: false,
+          message: `Integration for platform '${platformId}' not found`, 
+          availablePlatforms: integrations.map(i => i.serviceType)
+        });
+      }
+      
+      // Get financial data for this platform
+      const financialData = await getAggregatedFinancialData([integration]);
+      
+      // Send results
+      res.json({
+        success: true,
+        platform: {
+          id: platformId,
+          name: integration.name,
+          type: integration.serviceType
+        },
+        financialData,
+        timestamp: new Date()
+      });
+      
+    } catch (error: any) {
+      console.error(`Error testing platform ${req.params.platformId}:`, error);
+      res.status(500).json({ 
+        success: false,
+        message: `Failed to test platform: ${error.message}`
+      });
+    }
+  });
+
+// GitHub Integration Routes
   
   // Get GitHub repositories
   api.get("/github/repositories", async (req: Request, res: Response) => {
