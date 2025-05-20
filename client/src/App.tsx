@@ -25,7 +25,7 @@ export const AuthContext = createContext<{
 
 function Router() {
   const [location] = useLocation();
-  const showSidebar = location !== "/login" && location !== "/register";
+  const showSidebar = location !== "/login" && location !== "/register" && location !== "/connect-accounts";
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -36,6 +36,8 @@ function Router() {
           <Switch>
             <Route path="/" component={Dashboard} />
             <Route path="/settings" component={Settings} />
+            <Route path="/login" component={Login} />
+            <Route path="/connect-accounts" component={ConnectAccounts} />
             <Route component={NotFound} />
           </Switch>
         </main>
@@ -50,30 +52,44 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Auto-login for demo purposes
+    // Attempt to get the user session
     fetch("/api/session")
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Not authenticated');
+        }
+        return res.json();
+      })
       .then(data => {
         setUser(data);
         setLoading(false);
       })
       .catch(err => {
         console.error("Failed to get session:", err);
+        setUser(null);
         setLoading(false);
       });
   }, []);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-background">
-        <div className="text-primary">Loading...</div>
+      <div className="flex items-center justify-center h-screen bg-zinc-950">
+        <div className="animate-spin w-8 h-8 border-4 border-lime-500 border-t-transparent rounded-full"></div>
       </div>
     );
   }
 
+  const authContextValue = {
+    user,
+    isAuthenticated: !!user,
+    isLoading: loading
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
-      <Router />
+      <AuthContext.Provider value={authContextValue}>
+        <Router />
+      </AuthContext.Provider>
     </QueryClientProvider>
   );
 }
