@@ -2,13 +2,26 @@ import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
-import { useEffect, useState } from "react";
+import { useEffect, useState, createContext } from "react";
 import Dashboard from "@/pages/Dashboard";
 import Settings from "@/pages/Settings";
+import Login from "@/pages/Login";
+import ConnectAccounts from "@/pages/ConnectAccounts";
 import NotFound from "@/pages/not-found";
 import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
 import { User } from "@shared/schema";
+
+// Create auth context for the application
+export const AuthContext = createContext<{
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+}>({
+  user: null,
+  isAuthenticated: false,
+  isLoading: true,
+});
 
 function Router() {
   const [location] = useLocation();
