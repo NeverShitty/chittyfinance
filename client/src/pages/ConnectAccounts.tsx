@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,8 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
-import { SiBraintree, SiMercury, SiQuickbooks, SiStripe, SiWakatime } from "react-icons/si";
-import { useAuth } from "@/hooks/useAuth";
+import { Building, CreditCard, DollarSign, BarChart4, Home, CreditCard as CreditCardIcon } from "lucide-react";
+import { AuthContext } from "../App";
 
 // Service connection card component
 interface ServiceCardProps {
@@ -49,7 +49,7 @@ function ServiceCard({ name, description, icon, connected, onConnect }: ServiceC
 export default function ConnectAccounts() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState("banking");
   const [loading, setLoading] = useState(false);
   const [apiKey, setApiKey] = useState("");
@@ -148,17 +148,23 @@ export default function ConnectAccounts() {
   const getServiceIcon = (serviceType: string, size = 24) => {
     switch (serviceType) {
       case "mercury_bank":
-        return <SiMercury size={size} />;
+        return <Building size={size} />;
       case "stripe":
-        return <SiStripe size={size} />;
+        return <CreditCard size={size} />;
       case "quickbooks":
-        return <SiQuickbooks size={size} />;
+        return <BarChart4 size={size} />;
       case "wavapps":
-        return <SiWakatime size={size} />;
+        return <BarChart4 size={size} />;
       case "brex":
-        return <SiBraintree size={size} />;
+        return <CreditCardIcon size={size} />;
+      case "doorloop":
+        return <Home size={size} />;
+      case "xero":
+        return <BarChart4 size={size} />;
+      case "gusto":
+        return <DollarSign size={size} />;
       default:
-        return <SiWakatime size={size} />;
+        return <CreditCard size={size} />;
     }
   };
 
