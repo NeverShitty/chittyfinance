@@ -192,91 +192,33 @@ export default function AICFOAssistant() {
               </AvatarFallback>
             </Avatar>
             <div>
-              <CardTitle className="text-lg text-zinc-100">AI CFO Assistant</CardTitle>
-              <CardDescription className="text-zinc-400 text-xs">
-                Powered by OpenAI GPT-4
-              </CardDescription>
+              <div className="flex items-center">
+                <CardTitle className="text-lg text-zinc-100">AI CFO Assistant</CardTitle>
+                <Badge className="ml-2 bg-lime-500/20 text-lime-400 hover:bg-lime-500/30">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  Active
+                </Badge>
+              </div>
             </div>
-            <Badge className="ml-2 bg-lime-500/20 text-lime-400 hover:bg-lime-500/30">
-              <Sparkles className="w-3 h-3 mr-1" />
-              Active
-            </Badge>
           </div>
-          <Tabs 
-            value={activeTab} 
-            onValueChange={setActiveTab}
-            className="w-auto"
-          >
-            <TabsList className="bg-zinc-800 border border-zinc-700">
-              <TabsTrigger 
-                value="assistant" 
-                className={cn(
-                  "text-xs",
-                  activeTab === "assistant" ? "bg-lime-500 text-black" : "text-zinc-400"
-                )}
-              >
-                Assistant
-              </TabsTrigger>
-              <TabsTrigger 
-                value="insights" 
-                className={cn(
-                  "text-xs",
-                  activeTab === "insights" ? "bg-lime-500 text-black" : "text-zinc-400"
-                )}
-              >
-                Insights
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
         </div>
       </CardHeader>
       
       <CardContent>
-        <TabsContent value="assistant" className="m-0 pt-2">
-          <div className="relative min-h-[180px] max-h-[250px] overflow-y-auto pr-1 custom-scrollbar">
-            <div className="space-y-4 mb-4">
-              <div className="flex items-start">
-                <Avatar className="h-8 w-8 mr-3">
-                  <AvatarImage src="/assets/SERVICES.png" />
-                  <AvatarFallback className="bg-zinc-800 text-lime-500"><Bot /></AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  {formatMessage(latestMessage?.content || "I'm your AI CFO assistant. How can I help you today?")}
-                </div>
+        <div className="relative min-h-[180px] max-h-[350px] overflow-y-auto pr-1 custom-scrollbar bg-zinc-950/30 rounded-md p-4 border border-zinc-800">
+          <div className="flex items-start">
+            <Avatar className="h-8 w-8 mr-3 mt-1">
+              <AvatarImage src="/assets/SERVICES.png" />
+              <AvatarFallback className="bg-zinc-800 text-lime-500"><Lightbulb /></AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <div className="text-lime-500 font-semibold mb-1">AI CFO:</div>
+              <div className="text-zinc-300">
+                {formatMessage(latestMessage?.content || "To create a sustainable cost reduction plan, we aim to identify and eliminate inefficiencies, negotiate better terms, and optimize resource allocation. Here is the proposed plan: 1. **Conduct a Comprehensive Expense Audit** - **Action**: Perform a detailed review of all expense categories to identify any redundant or non-essential spending. - **Timeline**: 1-2 weeks. - **Goal**: Identify at least 5% of expenses that can be reduced or eliminated.")}
               </div>
             </div>
           </div>
-        </TabsContent>
-        
-        <TabsContent value="insights" className="m-0 pt-2">
-          <div className="min-h-[180px] max-h-[250px] overflow-y-auto pr-1 custom-scrollbar">
-            <div className="space-y-4">
-              <div className="p-3 bg-zinc-800/40 rounded-md border border-lime-500/20">
-                <div className="flex items-center mb-2">
-                  <TrendingUp className="h-5 w-5 mr-2 text-lime-500" />
-                  <h4 className="font-medium text-zinc-200">Cash Flow Forecast</h4>
-                </div>
-                <p className="text-sm text-zinc-300">Based on current trends, your cash flow will remain <span className="text-lime-400 font-medium">positive</span> for the next <span className="text-lime-400 font-medium">5 months</span>. Consider setting aside <span className="text-lime-400 font-medium">$45,000</span> for upcoming tax obligations.</p>
-              </div>
-              
-              <div className="p-3 bg-zinc-800/40 rounded-md border border-orange-500/20">
-                <div className="flex items-center mb-2">
-                  <AlertCircle className="h-5 w-5 mr-2 text-orange-500" />
-                  <h4 className="font-medium text-zinc-200">Expense Alert</h4>
-                </div>
-                <p className="text-sm text-zinc-300">Your software subscription expenses increased by <span className="text-orange-400 font-medium">23%</span> this quarter. Review the optimization recommendations in the Charge Automation section.</p>
-              </div>
-              
-              <div className="p-3 bg-zinc-800/40 rounded-md border border-lime-500/20">
-                <div className="flex items-center mb-2">
-                  <BarChart2 className="h-5 w-5 mr-2 text-lime-500" />
-                  <h4 className="font-medium text-zinc-200">Revenue Growth</h4>
-                </div>
-                <p className="text-sm text-zinc-300">Your Q2 revenue is <span className="text-lime-400 font-medium">12.5%</span> higher than Q1. Top performing service: <span className="text-lime-400 font-medium">SaaS Consulting</span> with <span className="text-lime-400 font-medium">31%</span> growth.</p>
-              </div>
-            </div>
-          </div>
-        </TabsContent>
+        </div>
       </CardContent>
       
       <CardFooter>
