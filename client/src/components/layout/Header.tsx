@@ -1,4 +1,5 @@
 import { Bell, MoreVertical } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Input } from "@/components/ui/input";
 import { formatDate } from "@/lib/utils";
