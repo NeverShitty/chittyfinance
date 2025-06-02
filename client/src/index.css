@@ -2,29 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .card {
+    @apply bg-card border border-border/40 shadow-lg hover:shadow-xl transition-shadow duration-200;
+  }
+  
+  .dashboard-grid {
+    @apply grid gap-6 md:grid-cols-2 lg:grid-cols-3;
+  }
+
+  .hover-lift {
+    @apply transition-transform duration-200 hover:-translate-y-1;
+  }
+}
+
 @layer base {
   * {
     @apply border-border;
   }
 
   body {
-    @apply font-sans antialiased bg-zinc-950 text-zinc-50;
+    @apply font-sans antialiased bg-gradient-to-b from-zinc-950 to-zinc-900 text-zinc-50 min-h-screen;
   }
 
   .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-lime-400 to-emerald-400;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-lime-400 via-emerald-400 to-lime-500 animate-gradient;
   }
   
   .card {
-    @apply bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-lg;
+    @apply bg-zinc-900/50 backdrop-blur-sm border border-zinc-800/50 rounded-xl overflow-hidden shadow-xl transition-all duration-300 hover:border-lime-500/20 hover:shadow-lime-500/5;
   }
   
   .card-header {
-    @apply border-b border-zinc-800 p-4 font-medium text-lime-400;
+    @apply border-b border-zinc-800/50 p-4 font-medium bg-gradient-to-r from-lime-400/10 to-transparent text-lime-400;
   }
   
   .card-content {
-    @apply p-4;
+    @apply p-4 space-y-3;
+  }
+
+  @keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .animate-gradient {
+    animation: gradient 4s ease infinite;
+    background-size: 200% 200%;
   }
   
   .pulse-connection {
@@ -42,19 +67,30 @@
 
   /* Custom scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
   
   ::-webkit-scrollbar-track {
-    background: theme('colors.zinc.900');
+    background: theme('colors.zinc.950');
   }
   
   ::-webkit-scrollbar-thumb {
-    background: theme('colors.zinc.700');
-    border-radius: 4px;
+    background: theme('colors.zinc.800');
+    border-radius: 999px;
+    transition: all 0.3s;
   }
   
   ::-webkit-scrollbar-thumb:hover {
     background: theme('colors.lime.500');
+  }
+
+  /* Improved focus styles */
+  :focus-visible {
+    @apply outline-none ring-2 ring-lime-500/50 ring-offset-2 ring-offset-zinc-950;
+  }
+
+  /* Button hover effects */
+  button:not(:disabled):hover {
+    @apply transform scale-[1.02] transition-transform;
   }
 }

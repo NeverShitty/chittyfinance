@@ -229,12 +229,14 @@ export default function ChargeAutomation() {
                         <h4 className="font-medium text-zinc-100">
                           {optimization.merchantName}
                         </h4>
-                        <p className="text-sm text-zinc-400 mt-1">
-                          <Badge className="mr-2 bg-zinc-900 text-lime-400 border border-lime-500/20">
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge className="bg-zinc-900 text-lime-400 border border-lime-500/20">
                             {optimization.suggestedAction.toUpperCase()}
                           </Badge>
-                          {optimization.reasoning}
-                        </p>
+                          <p className="text-sm text-zinc-400">
+                            {optimization.reasoning}
+                          </p>
+                        </div>
                       </div>
                       <div className="text-right">
                         <p className="font-semibold text-zinc-300">
