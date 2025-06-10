@@ -8,7 +8,7 @@
   }
   
   .dashboard-grid {
-    @apply grid gap-6 md:grid-cols-2 lg:grid-cols-3;
+    @apply grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3;
   }
 
   .hover-lift {
@@ -92,5 +92,29 @@
   /* Button hover effects */
   button:not(:disabled):hover {
     @apply transform scale-[1.02] transition-transform;
+  }
+
+  /* Mobile optimizations */
+  @media (max-width: 768px) {
+    /* Larger touch targets on mobile */
+    button, [role="button"] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    
+    /* Better text sizing on mobile */
+    .card-header {
+      @apply text-sm;
+    }
+    
+    /* Improved spacing on mobile */
+    .card {
+      @apply mx-2;
+    }
+    
+    /* Mobile-friendly scrollbars */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
   }
 }
