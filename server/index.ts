@@ -2,7 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
 import { setupVite, serveStatic, log } from "./vite";
 import { errorHandler } from "./middleware/errorHandler";
-import apiRoutes from "./routes";
+import registerRoutes from "./routes";
 import { setupAuth } from "./replitAuth";
 
 const app = express();
@@ -48,7 +48,7 @@ app.use((req, res, next) => {
   setupAuth(app);
 
   // API routes
-  app.use("/api", apiRoutes);
+  const httpServer = await registerRoutes(app);
 
   // Error handler (must be after all routes)
   app.use(errorHandler);
