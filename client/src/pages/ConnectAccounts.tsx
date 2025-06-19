@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { Building, CreditCard, DollarSign, BarChart4, Home, CreditCard as CreditCardIcon } from "lucide-react";
-import { AuthContext } from "../App";
+import { useAuth } from "../hooks/useAuth";
 
 // Service connection card component
 interface ServiceCardProps {
@@ -49,7 +49,7 @@ function ServiceCard({ name, description, icon, connected, onConnect }: ServiceC
 export default function ConnectAccounts() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const { user, isAuthenticated, isLoading } = useContext(AuthContext);
+  const { user, isAuthenticated, isLoading } = useAuth();
   const [activeTab, setActiveTab] = useState("banking");
   const [loading, setLoading] = useState(false);
   const [apiKey, setApiKey] = useState("");

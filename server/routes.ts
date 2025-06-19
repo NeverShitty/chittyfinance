@@ -14,6 +14,7 @@ import {
 } from "./lib/github";
 import { transformToUniversalFormat } from "./lib/universalConnector";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+import { DataFetcher, handleWebhook } from "./lib/dataFetcher";
 
 // Function to seed new integrations for the demo user
 async function seedNewIntegrations() {
@@ -676,6 +677,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Contradiction Engine endpoints
+  api.get("/contradictions/analysis", async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserByUsername("demo");
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const integrations = await storage.getIntegrations(user.id);
+      const financialData = await getAggregatedFinancialData(integrations);
+      const charges = await getRecurringCharges(user.id);
+      
+      const { detectFinancialContradictions } = await import("./lib/contradictionEngine");
+      const analysis = await detectFinancialContradictions([financialData], charges);
+      
+      res.json(analysis);
+    } catch (error: any) {
+      console.error("Error analyzing contradictions:", error);
+      res.status(500).json({ error: "Failed to analyze contradictions" });
+    }
+  });
+
+  api.post("/contradictions/analyze", async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserByUsername("demo");
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const integrations = await storage.getIntegrations(user.id);
+      const financialData = await getAggregatedFinancialData(integrations);
+      const charges = await getRecurringCharges(user.id);
+      
+      const { detectFinancialContradictions } = await import("./lib/contradictionEngine");
+      const analysis = await detectFinancialContradictions([financialData], charges);
+      
+      res.json({ success: true, analysis });
+    } catch (error: any) {
+      console.error("Error running contradiction analysis:", error);
+      res.status(500).json({ error: "Failed to run contradiction analysis" });
+    }
+  });
+
+  api.post("/contradictions/resolution-plan", async (req: Request, res: Response) => {
+    try {
+      const { contradictions } = req.body;
+      const { generateResolutionPlan } = await import("./lib/contradictionEngine");
+      const plan = await generateResolutionPlan(contradictions);
+      
+      res.json({ plan });
+    } catch (error: any) {
+      console.error("Error generating resolution plan:", error);
+      res.status(500).json({ error: "Failed to generate resolution plan" });
+    }
+  });
+
   // Universal Connector endpoint
   api.get("/universal-connector", async (req: Request, res: Response) => {
     try {
@@ -862,9 +919,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Webhook endpoints for real-time data updates
+  api.post("/webhooks/:serviceType", async (req: Request, res: Response) => {
+    try {
+      const { serviceType } = req.params;
+      const payload = req.body;
+      
+      console.log(`Received webhook for ${serviceType}`);
+      await handleWebhook(serviceType, payload);
+      
+      res.status(200).json({ received: true });
+    } catch (error) {
+      console.error("Webhook processing error:", error);
+      res.status(500).json({ error: "Webhook processing failed" });
+    }
+  });
+
+  // Cache management endpoints
+  api.post("/cache/clear", async (req: Request, res: Response) => {
+    try {
+      const { integrationId } = req.body;
+      DataFetcher.clearCache(integrationId);
+      
+      res.json({ 
+        message: integrationId ? 
+          `Cache cleared for integration ${integrationId}` : 
+          "All cache cleared"
+      });
+    } catch (error) {
+      console.error("Cache clear error:", error);
+      res.status(500).json({ error: "Failed to clear cache" });
+    }
+  });
+
+  api.get("/cache/stats", async (req: Request, res: Response) => {
+    try {
+      const stats = DataFetcher.getCacheStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Cache stats error:", error);
+      res.status(500).json({ error: "Failed to get cache stats" });
+    }
+  });
+
+  // Real-time data refresh endpoint
+  api.post("/data/refresh", async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserByUsername("demo");
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const { serviceType } = req.body;
+      
+      if (serviceType) {
+        // Clear cache for specific service
+        DataFetcher.clearCache();
+        console.log(`Forcing refresh for ${serviceType}`);
+      } else {
+        // Clear all cache to force full refresh
+        DataFetcher.clearCache();
+        console.log("Forcing full data refresh");
+      }
+
+      // Get fresh data
+      const integrations = await storage.getIntegrations(user.id);
+      const financialData = await getAggregatedFinancialData(integrations);
+      
+      res.json({
+        message: "Data refreshed successfully",
+        summary: {
+          cashOnHand: financialData.cashOnHand,
+          monthlyRevenue: financialData.monthlyRevenue,
+          monthlyExpenses: financialData.monthlyExpenses,
+          transactionCount: financialData.transactions?.length || 0
+        }
+      });
+    } catch (error) {
+      console.error("Data refresh error:", error);
+      res.status(500).json({ error: "Failed to refresh data" });
+    }
+  });
+
   // Register API routes
   app.use("/api", api);
 
   const httpServer = createServer(app);
   return httpServer;
 }
+
+export { registerRoutes };
+export default registerRoutes;

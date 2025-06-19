@@ -1,21 +1,12 @@
-import { useContext } from "react";
-import { AuthContext } from "../App";
-import { useQuery } from "@tanstack/react-query";
+import { useUser } from '@/contexts/UserContext';
 
 export function useAuth() {
-  // Use the auth context for immediate access to auth state
-  const authContext = useContext(AuthContext);
+  const { user, isLoading, error } = useUser();
   
-  // Use react-query to fetch the latest user data
-  const { data: user, isLoading } = useQuery({
-    queryKey: ["/api/session"],
-    retry: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-
   return {
-    user: user || authContext.user,
-    isLoading: isLoading || authContext.isLoading,
-    isAuthenticated: !!user || authContext.isAuthenticated,
+    user,
+    isAuthenticated: !!user,
+    isLoading,
+    error
   };
 }

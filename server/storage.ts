@@ -110,6 +110,12 @@ export class DatabaseStorage implements IStorage {
     return integration || undefined;
   }
 
+  async deleteIntegration(id: number): Promise<void> {
+    await db
+      .delete(integrations)
+      .where(eq(integrations.id, id));
+  }
+
   // Financial summary operations
   async getFinancialSummary(userId: number): Promise<FinancialSummary | undefined> {
     const [summary] = await db
@@ -140,7 +146,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Transaction operations
-  async getTransactions(userId: number, limit?: number): Promise<Transaction[]> {
+  async getTransactions(userId: number, limit?: number, offset?: number): Promise<Transaction[]> {
     let query = db
       .select()
       .from(transactions)
@@ -149,6 +155,10 @@ export class DatabaseStorage implements IStorage {
 
     if (limit) {
       query = query.limit(limit);
+    }
+
+    if (offset) {
+      query = query.offset(offset);
     }
 
     return await query;
@@ -246,6 +256,16 @@ export class DatabaseStorage implements IStorage {
 
 // Use the DatabaseStorage
 export const storage = new DatabaseStorage();
+
+// Export individual methods for compatibility
+export const getUserByUsername = (username: string) => storage.getUserByUsername(username);
+export const getFinancialSummary = (userId: number) => storage.getFinancialSummary(userId);
+export const getIntegrations = (userId: number) => storage.getIntegrations(userId);
+export const addIntegration = (userId: number, serviceType: string, config?: any) => 
+  storage.createIntegration({ userId, serviceType, name: serviceType, description: '', connected: true, credentials: config || {} });
+export const updateIntegration = (id: number, updates: any) => storage.updateIntegration(id, updates);
+export const removeIntegration = (id: number) => storage.deleteIntegration(id);
+export const getTransactions = (userId: number, limit: number, offset: number) => storage.getTransactions(userId, limit, offset);
 
 // Initialize default data
 (async () => {
