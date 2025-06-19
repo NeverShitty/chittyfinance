@@ -677,6 +677,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Contradiction Engine endpoints
+  api.get("/contradictions/analysis", async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserByUsername("demo");
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const integrations = await storage.getIntegrations(user.id);
+      const financialData = await getAggregatedFinancialData(integrations);
+      const charges = await getRecurringCharges(user.id);
+      
+      const { detectFinancialContradictions } = await import("./lib/contradictionEngine");
+      const analysis = await detectFinancialContradictions([financialData], charges);
+      
+      res.json(analysis);
+    } catch (error: any) {
+      console.error("Error analyzing contradictions:", error);
+      res.status(500).json({ error: "Failed to analyze contradictions" });
+    }
+  });
+
+  api.post("/contradictions/analyze", async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserByUsername("demo");
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const integrations = await storage.getIntegrations(user.id);
+      const financialData = await getAggregatedFinancialData(integrations);
+      const charges = await getRecurringCharges(user.id);
+      
+      const { detectFinancialContradictions } = await import("./lib/contradictionEngine");
+      const analysis = await detectFinancialContradictions([financialData], charges);
+      
+      res.json({ success: true, analysis });
+    } catch (error: any) {
+      console.error("Error running contradiction analysis:", error);
+      res.status(500).json({ error: "Failed to run contradiction analysis" });
+    }
+  });
+
+  api.post("/contradictions/resolution-plan", async (req: Request, res: Response) => {
+    try {
+      const { contradictions } = req.body;
+      const { generateResolutionPlan } = await import("./lib/contradictionEngine");
+      const plan = await generateResolutionPlan(contradictions);
+      
+      res.json({ plan });
+    } catch (error: any) {
+      console.error("Error generating resolution plan:", error);
+      res.status(500).json({ error: "Failed to generate resolution plan" });
+    }
+  });
+
   // Universal Connector endpoint
   api.get("/universal-connector", async (req: Request, res: Response) => {
     try {
@@ -951,3 +1007,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
   return httpServer;
 }
+
+export { registerRoutes };
+export default registerRoutes;
