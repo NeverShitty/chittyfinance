@@ -14,6 +14,7 @@ import {
 } from "./lib/github";
 import { transformToUniversalFormat } from "./lib/universalConnector";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+import { DataFetcher, handleWebhook } from "./lib/dataFetcher";
 
 // Function to seed new integrations for the demo user
 async function seedNewIntegrations() {
@@ -859,6 +860,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error(`Error fetching issues for ${req.params.repoFullName}:`, error);
       res.status(500).json({ message: "Failed to fetch repository issues" });
+    }
+  });
+
+  // Webhook endpoints for real-time data updates
+  api.post("/webhooks/:serviceType", async (req: Request, res: Response) => {
+    try {
+      const { serviceType } = req.params;
+      const payload = req.body;
+      
+      console.log(`Received webhook for ${serviceType}`);
+      await handleWebhook(serviceType, payload);
+      
+      res.status(200).json({ received: true });
+    } catch (error) {
+      console.error("Webhook processing error:", error);
+      res.status(500).json({ error: "Webhook processing failed" });
+    }
+  });
+
+  // Cache management endpoints
+  api.post("/cache/clear", async (req: Request, res: Response) => {
+    try {
+      const { integrationId } = req.body;
+      DataFetcher.clearCache(integrationId);
+      
+      res.json({ 
+        message: integrationId ? 
+          `Cache cleared for integration ${integrationId}` : 
+          "All cache cleared"
+      });
+    } catch (error) {
+      console.error("Cache clear error:", error);
+      res.status(500).json({ error: "Failed to clear cache" });
+    }
+  });
+
+  api.get("/cache/stats", async (req: Request, res: Response) => {
+    try {
+      const stats = DataFetcher.getCacheStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Cache stats error:", error);
+      res.status(500).json({ error: "Failed to get cache stats" });
+    }
+  });
+
+  // Real-time data refresh endpoint
+  api.post("/data/refresh", async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserByUsername("demo");
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const { serviceType } = req.body;
+      
+      if (serviceType) {
+        // Clear cache for specific service
+        DataFetcher.clearCache();
+        console.log(`Forcing refresh for ${serviceType}`);
+      } else {
+        // Clear all cache to force full refresh
+        DataFetcher.clearCache();
+        console.log("Forcing full data refresh");
+      }
+
+      // Get fresh data
+      const integrations = await storage.getIntegrations(user.id);
+      const financialData = await getAggregatedFinancialData(integrations);
+      
+      res.json({
+        message: "Data refreshed successfully",
+        summary: {
+          cashOnHand: financialData.cashOnHand,
+          monthlyRevenue: financialData.monthlyRevenue,
+          monthlyExpenses: financialData.monthlyExpenses,
+          transactionCount: financialData.transactions?.length || 0
+        }
+      });
+    } catch (error) {
+      console.error("Data refresh error:", error);
+      res.status(500).json({ error: "Failed to refresh data" });
     }
   });
 
