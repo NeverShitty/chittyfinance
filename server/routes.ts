@@ -74,7 +74,7 @@ async function seedNewIntegrations() {
   }
 }
 
-export async function registerRoutes(app: Express): Promise<Server> {
+async function registerRoutes(app: Express): Promise<Server> {
   // Setup Replit Auth
   await setupAuth(app);
   
@@ -1008,5 +1008,4 @@ export async function registerRoutes(app: Express): Promise<Server> {
   return httpServer;
 }
 
-export { registerRoutes };
 export default registerRoutes;
