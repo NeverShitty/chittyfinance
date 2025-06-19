@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { FinancialSummary } from "@shared/schema";
 import FinancialSummaryComponent from "@/components/dashboard/FinancialSummary";
 import AICFOAssistant from "@/components/dashboard/AICFOAssistant";
+import ContradictionEngine from "@/components/dashboard/ContradictionEngine";
 import ConnectedServices from "@/components/dashboard/ConnectedServices";
 import RecentTransactions from "@/components/dashboard/RecentTransactions";
 import FinancialTasks from "@/components/dashboard/FinancialTasks";
@@ -41,9 +42,10 @@ export default function Dashboard() {
           isLoading={isLoadingSummary} 
         />
 
-        {/* AI CFO Assistant Section */}
-        <div className="mt-8">
+        {/* AI CFO Assistant and Contradiction Engine Grid */}
+        <div className="mt-8 grid grid-cols-12 gap-6">
           <AICFOAssistant />
+          <ContradictionEngine />
         </div>
 
         {/* Integrations Section */}
