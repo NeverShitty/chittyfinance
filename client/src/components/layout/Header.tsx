@@ -11,15 +11,15 @@ export default function Header() {
     <header className="relative z-10 flex flex-shrink-0 h-16 bg-zinc-900 border-b border-zinc-800 shadow-lg">
       <div className="flex justify-between flex-1 px-2 sm:px-4">
         <div className="flex flex-1 items-center min-w-0">
-          {/* Chitty Services Logo - responsive */}
+          {/* ChittyFinance Logo - responsive */}
           <div className="flex items-center mr-2 sm:mr-6 flex-shrink-0">
             <img 
               src="/assets/SERVICES.png" 
-              alt="Chitty Services Logo" 
+              alt="ChittyFinance Logo" 
               className="h-8 sm:h-10 w-auto"
             />
             <div className="ml-1 sm:ml-2 hidden sm:block">
-              <span className="text-sm sm:text-lg font-bold gradient-text">Chitty Services</span>
+              <span className="text-sm sm:text-lg font-bold gradient-text">ChittyFinance</span>
             </div>
           </div>
           

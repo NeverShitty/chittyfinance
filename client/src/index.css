@@ -22,23 +22,33 @@
   }
 
   body {
-    @apply font-sans antialiased bg-gradient-to-b from-zinc-950 to-zinc-900 text-zinc-50 min-h-screen;
+    @apply font-sans antialiased bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50 min-h-screen;
+    font-feature-settings: "cv11", "ss01";
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-lime-400 via-emerald-400 to-lime-500 animate-gradient;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-emerald-300 to-gold-400;
+    background-size: 200% 200%;
+    animation: gradient 6s ease-in-out infinite;
   }
   
   .card {
-    @apply bg-zinc-900/50 backdrop-blur-sm border border-zinc-800/50 rounded-xl overflow-hidden shadow-xl transition-all duration-300 hover:border-lime-500/20 hover:shadow-lime-500/5;
+    @apply bg-slate-900/40 backdrop-blur-sm border border-slate-800/40 rounded-2xl overflow-hidden shadow-large transition-all duration-500 ease-out hover:border-emerald-500/30 hover:shadow-glow hover:-translate-y-1;
+    backdrop-filter: blur(16px) saturate(180%);
   }
   
   .card-header {
-    @apply border-b border-zinc-800/50 p-4 font-medium bg-gradient-to-r from-lime-400/10 to-transparent text-lime-400;
+    @apply border-b border-slate-800/30 p-6 font-semibold bg-gradient-to-r from-emerald-500/10 via-emerald-400/5 to-transparent text-emerald-400 tracking-wide;
+    font-size: 0.875rem;
+    letter-spacing: 0.025em;
   }
   
   .card-content {
-    @apply p-4 space-y-3;
+    @apply p-6 space-y-4;
   }
 
   @keyframes gradient {
@@ -65,23 +75,26 @@
     }
   }
 
-  /* Custom scrollbar */
+  /* Premium scrollbar */
   ::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
   }
   
   ::-webkit-scrollbar-track {
-    background: theme('colors.zinc.950');
+    background: theme('colors.slate.950');
+    border-radius: 999px;
   }
   
   ::-webkit-scrollbar-thumb {
-    background: theme('colors.zinc.800');
+    background: linear-gradient(135deg, theme('colors.slate.800'), theme('colors.slate.700'));
     border-radius: 999px;
-    transition: all 0.3s;
+    border: 2px solid theme('colors.slate.950');
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    background: theme('colors.lime.500');
+    background: linear-gradient(135deg, theme('colors.emerald.600'), theme('colors.emerald.500'));
+    border-color: theme('colors.emerald.900');
   }
 
   /* Improved focus styles */
@@ -89,11 +102,49 @@
     @apply outline-none ring-2 ring-lime-500/50 ring-offset-2 ring-offset-zinc-950;
   }
 
-  /* Button hover effects */
+  /* Premium button interactions */
+  button:not(:disabled) {
+    @apply transition-all duration-300 ease-out;
+  }
+  
   button:not(:disabled):hover {
-    @apply transform scale-[1.02] transition-transform;
+    @apply transform scale-[1.02] shadow-medium;
+  }
+  
+  button:not(:disabled):active {
+    @apply transform scale-[0.98] transition-transform duration-150;
   }
 
+  /* Premium loading states */
+  .skeleton {
+    @apply relative overflow-hidden bg-slate-800/50 rounded;
+  }
+  
+  .skeleton::after {
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-slate-700/20 to-transparent;
+    content: '';
+    animation: shimmer 2s linear infinite;
+  }
+  
+  /* Premium focus states */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:ring-offset-2 focus:ring-offset-slate-950;
+  }
+  
+  /* Luxury elevation */
+  .elevated {
+    @apply shadow-luxury backdrop-blur-sm;
+  }
+  
+  /* Premium text hierarchy */
+  .heading-luxury {
+    @apply font-serif font-normal tracking-tight;
+  }
+  
+  .text-luxury {
+    @apply text-slate-300 leading-relaxed;
+  }
+  
   /* Mobile optimizations */
   @media (max-width: 768px) {
     /* Larger touch targets on mobile */
@@ -104,12 +155,16 @@
     
     /* Better text sizing on mobile */
     .card-header {
-      @apply text-sm;
+      @apply text-sm p-4;
+    }
+    
+    .card-content {
+      @apply p-4;
     }
     
     /* Improved spacing on mobile */
     .card {
-      @apply mx-2;
+      @apply mx-2 rounded-xl;
     }
     
     /* Mobile-friendly scrollbars */

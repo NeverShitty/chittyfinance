@@ -17,56 +17,85 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="py-6">
-      {/* Page Header */}
-      <div className="px-4 sm:px-6 md:px-8">
-        <h1 className="text-3xl font-bold gradient-text">
-          Chitty Services CFO Dashboard
-        </h1>
-        
-        <div className="mt-2 flex items-center text-sm text-zinc-400">
-          {/* AI Assistant Status */}
-          <div className="flex items-center">
-            <div className="h-2.5 w-2.5 rounded-full bg-lime-400 pulse-connection mr-1.5"></div>
-            <span>AI CFO Assistant Active</span>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      {/* Page Header - Premium spacing and typography */}
+      <div className="px-6 sm:px-8 md:px-12 pt-8 pb-12">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-serif font-normal tracking-tight gradient-text mb-4">
+            ChittyFinance
+          </h1>
+          <p className="text-xl text-slate-400 font-light mb-6">
+            Executive Financial Dashboard
+          </p>
+          
+          <div className="flex items-center space-x-6 text-sm text-slate-400">
+            {/* AI Assistant Status - Premium indicator */}
+            <div className="flex items-center space-x-2">
+              <div className="relative">
+                <div className="h-3 w-3 rounded-full bg-emerald-400 animate-soft-glow"></div>
+                <div className="absolute inset-0 h-3 w-3 rounded-full bg-emerald-400 animate-ping opacity-20"></div>
+              </div>
+              <span className="font-medium">AI CFO Active</span>
+            </div>
+            <div className="h-4 w-px bg-slate-700"></div>
+            <div className="font-mono text-xs tracking-wider">
+              Last updated: {formatDate(new Date())}
+            </div>
           </div>
-          <span className="mx-2">•</span>
-          <div>Last updated: {formatDate(new Date())}</div>
         </div>
       </div>
 
-      {/* Financial Summary Section */}
-      <div className="px-4 sm:px-6 md:px-8 mt-8">
-        <FinancialSummaryComponent 
-          data={financialSummary} 
-          isLoading={isLoadingSummary} 
-        />
+      {/* Content Container - Premium layout with proper spacing */}
+      <div className="px-6 sm:px-8 md:px-12 pb-12">
+        <div className="max-w-7xl mx-auto space-y-12">
+          
+          {/* Financial Summary Section */}
+          <section className="animate-fade-in">
+            <FinancialSummaryComponent 
+              data={financialSummary} 
+              isLoading={isLoadingSummary} 
+            />
+          </section>
 
-        {/* AI CFO Assistant and Contradiction Engine Grid */}
-        <div className="mt-8 grid grid-cols-12 gap-6">
-          <AICFOAssistant />
-          <ContradictionEngine />
-        </div>
+          {/* AI CFO Assistant and Contradiction Engine Grid */}
+          <section className="animate-slide-in">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              <AICFOAssistant />
+              <ContradictionEngine />
+            </div>
+          </section>
 
-        {/* Integrations Section */}
-        <div className="mt-8">
-          <ConnectedServices />
-        </div>
-        
-        {/* Charge Automation Section */}
-        <div className="mt-8">
-          <ChargeAutomation />
-        </div>
+          {/* Service Integrations */}
+          <section className="space-y-8">
+            <div>
+              <h2 className="text-2xl font-serif font-normal text-slate-200 mb-6 tracking-wide">
+                Connected Services
+              </h2>
+              <ConnectedServices />
+            </div>
+            
+            <div>
+              <h2 className="text-2xl font-serif font-normal text-slate-200 mb-6 tracking-wide">
+                Automation & Tools
+              </h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <ChargeAutomation />
+                <GitHubRepositories />
+              </div>
+            </div>
+          </section>
 
-        {/* GitHub Repositories Section */}
-        <div className="mt-8">
-          <GitHubRepositories />
-        </div>
-
-        {/* Recent Transactions and Tasks */}
-        <div className="mt-8 grid grid-cols-1 gap-5 lg:grid-cols-2">
-          <RecentTransactions />
-          <FinancialTasks />
+          {/* Financial Activity */}
+          <section>
+            <h2 className="text-2xl font-serif font-normal text-slate-200 mb-6 tracking-wide">
+              Financial Activity
+            </h2>
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              <RecentTransactions />
+              <FinancialTasks />
+            </div>
+          </section>
+          
         </div>
       </div>
     </div>

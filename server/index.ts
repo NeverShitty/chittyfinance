@@ -4,13 +4,52 @@ import { setupVite, serveStatic, log } from "./vite";
 import { errorHandler } from "./middleware/errorHandler";
 import registerRoutes from "./routes";
 import { setupAuth } from "./replitAuth";
+import cors from "cors";
+import { 
+  helmetConfig, 
+  corsOptions, 
+  generalRateLimit, 
+  requestSizeLimit, 
+  ipSecurityCheck,
+  validateContentType,
+  securityLogger
+} from "./middleware/security";
+import { sanitizeRequest } from "./middleware/validation";
+import { validateEnvironmentSecurity } from "./lib/crypto";
 
 const app = express();
 const server = createServer(app);
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+// Validate environment security on startup
+const securityIssues = validateEnvironmentSecurity();
+if (securityIssues.length > 0) {
+  console.warn('Security Configuration Issues:');
+  securityIssues.forEach(issue => console.warn(`- ${issue}`));
+  
+  if (process.env.NODE_ENV === 'production') {
+    console.error('Cannot start in production with security issues');
+    process.exit(1);
+  }
+}
+
+// Trust proxy for accurate IP addresses (important for rate limiting)
+app.set('trust proxy', 1);
+
+// Security middleware (order is important)
+app.use(helmetConfig);
+app.use(cors(corsOptions));
+app.use(generalRateLimit);
+app.use(ipSecurityCheck);
+app.use(requestSizeLimit);
+app.use(securityLogger);
+
+// Body parsing middleware
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: false, limit: '10mb' }));
+
+// Content validation and sanitization
+app.use(validateContentType);
+app.use(sanitizeRequest);
 
 // Request logging middleware
 app.use((req, res, next) => {

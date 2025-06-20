@@ -64,11 +64,11 @@ export default function Sidebar() {
           <div className="flex items-center h-16 px-3 sm:px-4 border-b border-zinc-800">
             <img 
               src="/images/SERVICES.png" 
-              alt="Chitty Services Logo" 
+              alt="ChittyFinance Logo" 
               className="h-8 sm:h-10 w-auto"
             />
             <div className="ml-2">
-              <h2 className="text-base sm:text-lg font-bold gradient-text">Chitty Services</h2>
+              <h2 className="text-base sm:text-lg font-bold gradient-text">ChittyFinance</h2>
               <p className="text-xs text-zinc-400">AI CFO Assistant</p>
             </div>
           </div>

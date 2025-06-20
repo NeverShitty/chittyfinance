@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is the Chitty Services CFO Platform V2 - an advanced financial management platform integrating traditional finance with ChittyChain blockchain technology. Features comprehensive AI-powered financial analysis, DeFi portfolio management, and multi-chain transaction tracking.
+This is ChittyFinance - an advanced financial management platform integrating traditional finance with ChittyChain blockchain technology. Features comprehensive AI-powered financial analysis, DeFi portfolio management, and multi-chain transaction tracking.
 
 ## Essential Commands
 
@@ -132,9 +132,20 @@ Currently no test framework is configured. When adding tests, check with the use
 
 ## Environment Variables
 
+### Security Configuration (Required)
+- `ENCRYPTION_KEY`: 64 hex characters (32 bytes) for credential encryption
+- `SESSION_SECRET`: At least 32 characters for session security
+- `ALLOWED_ORIGINS`: Comma-separated list of allowed CORS origins
+- `BLOCKED_IP_RANGES`: Comma-separated IP ranges to block (optional)
+
 ### Core Infrastructure
 - `DATABASE_URL`: PostgreSQL connection string
 - `OPENAI_API_KEY`: For basic AI assistant functionality
+
+### Authentication (Replit Auth)
+- `REPL_ID`: Your Replit application ID
+- `ISSUER_URL`: OAuth issuer URL (default: https://replit.com/oidc)
+- `REPLIT_DOMAINS`: Comma-separated list of allowed domains
 
 ### ChittyChain Integration
 - `CHITTYCHAIN_API_KEY`: ChittyChain blockchain API access
@@ -178,3 +189,89 @@ Currently no test framework is configured. When adding tests, check with the use
 - Separate schemas for blockchain-specific data (wallets, DeFi positions, NFT holdings)
 - Portfolio snapshots for historical performance tracking
 - Comprehensive audit trails for compliance requirements
+
+## Key File Locations
+
+### Server Architecture
+- Main server entry: `server/index.ts` - Express server with middleware setup
+- Route registration: `server/routes/index.ts` - Central routing configuration
+- Authentication: `server/replitAuth.ts` - Replit authentication setup
+- Error handling: `server/middleware/errorHandler.ts` - Centralized error handling
+
+### Client Architecture  
+- Main app entry: `client/src/main.tsx` and `client/src/App.tsx`
+- Routing: Uses Wouter for client-side routing
+- State management: TanStack Query for server state, React Context for user state
+- UI components: Shadcn/ui components in `client/src/components/ui/`
+
+### Configuration Files
+- `vite.config.ts`: Vite build configuration with path aliases
+- `drizzle.config.ts`: Database migration configuration
+- `tsconfig.json`: TypeScript configuration
+- `tailwind.config.ts`: Tailwind CSS configuration
+
+## Database Management
+
+### Schema Structure
+- **V1 Schema** (`shared/schema.ts`): Core tables for users, integrations, transactions, AI messages
+- **V2 Schema** (`shared/schema-v2.ts`): Enhanced features with budgets, goals, invoices, reports
+- **ChittyChain Schema** (`shared/chittychain-schema.ts`): Blockchain-specific tables for wallets, DeFi, NFTs
+
+### Database Operations
+- Use `npm run db:push` to apply schema changes
+- Database URL must be set in `DATABASE_URL` environment variable
+- All schemas use Drizzle ORM with PostgreSQL
+
+## Service Integration Pattern
+
+All external service integrations extend `BaseServiceClient` (`server/lib/base/BaseServiceClient.ts`):
+- Consistent error handling and retry logic
+- Fallback data when services are unavailable
+- Standardized authentication headers
+- Built-in connection testing
+
+## Authentication & Security
+
+- Uses Replit Auth for user authentication
+- Sessions stored in PostgreSQL (`sessions` table)
+- Middleware in `server/middleware/auth.ts` handles session validation
+- User context provided via React Context (`client/src/contexts/UserContext.tsx`)
+
+## Port Configuration
+
+The application **ALWAYS** runs on port 5000:
+- Development server: `http://localhost:5000`
+- Production server: `http://localhost:5000`
+- API endpoints: `http://localhost:5000/api/*`
+
+## Security Requirements
+
+### Production Deployment Checklist
+1. **Environment Variables**: All required security variables must be set
+2. **HTTPS Only**: Application must run behind HTTPS in production
+3. **Secrets Management**: Never commit API keys or sensitive data to version control
+4. **Access Control**: Verify all routes have proper authentication and authorization
+5. **Rate Limiting**: Ensure rate limits are appropriate for your traffic patterns
+6. **Monitoring**: Set up security monitoring and alerting
+
+### Security Features Implemented
+- **Authentication**: Replit Auth with session validation and expiry
+- **Authorization**: Resource ownership validation prevents IDOR attacks
+- **Encryption**: AES-256-GCM encryption for sensitive credentials
+- **Password Security**: bcrypt hashing with salt rounds = 12
+- **Rate Limiting**: Tiered limits (general, auth, API) with IP-based tracking
+- **Input Validation**: Comprehensive Zod schemas with sanitization
+- **Security Headers**: Helmet.js with CSP, HSTS, and XSS protection
+- **CORS**: Configurable cross-origin policy with domain whitelisting
+- **Request Limits**: 10MB max request size with content-type validation
+- **Error Handling**: Sanitized error responses (no sensitive data exposure)
+- **Security Monitoring**: Suspicious activity detection and logging
+
+## Important Reminders
+
+- NEVER create files unless absolutely necessary for achieving the goal
+- ALWAYS prefer editing existing files over creating new ones
+- NEVER proactively create documentation files (*.md) or README files unless explicitly requested
+- Run `npm run check` for TypeScript validation before committing changes
+- **SECURITY**: Never disable security middleware without explicit approval
+- **ENVIRONMENT**: Use `.env.example` as template for environment setup

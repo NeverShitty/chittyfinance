@@ -1,14 +1,16 @@
 import { Router } from 'express';
-import { z } from 'zod';
 import { asyncHandler, APIError } from '../middleware/errorHandler';
-import { authenticateUser, AuthenticatedRequest } from '../middleware/auth';
-import { getFinancialSummary, getIntegrations, addIntegration, updateIntegration, removeIntegration } from '../storage';
+import { authenticateUser, AuthenticatedRequest, checkResourceOwnership } from '../middleware/auth';
+import { validateBody, validateParams, createIntegrationSchema, updateIntegrationSchema, idSchema } from '../middleware/validation';
+import { apiRateLimit } from '../middleware/security';
+import { storage } from '../storage';
 import { aggregateFinancialData } from '../lib/financialServices';
 import { APIResponse, FinancialSummaryData } from '../types/api';
 
 const router = Router();
 
-// Apply authentication to all routes
+// Apply rate limiting and authentication to all routes
+router.use(apiRateLimit);
 router.use(authenticateUser);
 
 router.get('/financial-summary', asyncHandler(async (req: AuthenticatedRequest, res) => {
@@ -17,8 +19,8 @@ router.get('/financial-summary', asyncHandler(async (req: AuthenticatedRequest, 
   }
 
   const [summary, integrations] = await Promise.all([
-    getFinancialSummary(req.user.id),
-    getIntegrations(req.user.id)
+    storage.getFinancialSummary(req.user.id),
+    storage.getIntegrations(req.user.id)
   ]);
 
   let aggregatedData: FinancialSummaryData;
@@ -63,17 +65,13 @@ router.get('/financial-summary', asyncHandler(async (req: AuthenticatedRequest, 
   res.json(response);
 }));
 
-const integrationSchema = z.object({
-  service: z.string(),
-  config: z.record(z.any()).optional()
-});
-
 router.get('/integrations', asyncHandler(async (req: AuthenticatedRequest, res) => {
   if (!req.user) {
     throw new APIError(401, 'User not authenticated', 'UNAUTHORIZED');
   }
 
-  const integrations = await getIntegrations(req.user.id);
+  // Use secure method that doesn't expose credentials
+  const integrations = await storage.getIntegrationsForAPI(req.user.id);
   
   const response: APIResponse = {
     success: true,
@@ -83,58 +81,71 @@ router.get('/integrations', asyncHandler(async (req: AuthenticatedRequest, res) 
   res.json(response);
 }));
 
-router.post('/integrations', asyncHandler(async (req: AuthenticatedRequest, res) => {
-  if (!req.user) {
-    throw new APIError(401, 'User not authenticated', 'UNAUTHORIZED');
-  }
+router.post('/integrations', 
+  validateBody(createIntegrationSchema),
+  asyncHandler(async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      throw new APIError(401, 'User not authenticated', 'UNAUTHORIZED');
+    }
 
-  const data = integrationSchema.parse(req.body);
-  const integration = await addIntegration(req.user.id, data.service, data.config);
-  
-  const response: APIResponse = {
-    success: true,
-    data: integration
-  };
-  
-  res.status(201).json(response);
-}));
+    const integrationData = {
+      ...req.body,
+      userId: req.user.id
+    };
+    
+    const integration = await storage.createIntegration(integrationData);
+    
+    // Remove credentials from response
+    const { credentials, ...safeIntegration } = integration;
+    
+    const response: APIResponse = {
+      success: true,
+      data: safeIntegration
+    };
+    
+    res.status(201).json(response);
+  })
+);
 
-router.put('/integrations/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
-  if (!req.user) {
-    throw new APIError(401, 'User not authenticated', 'UNAUTHORIZED');
-  }
+router.put('/integrations/:id',
+  validateParams(idSchema),
+  validateBody(updateIntegrationSchema),
+  checkResourceOwnership('integration'),
+  asyncHandler(async (req: AuthenticatedRequest, res) => {
+    const { id } = req.params;
+    
+    const integration = await storage.updateIntegration(id, req.body);
+    
+    if (!integration) {
+      throw new APIError(404, 'Integration not found', 'NOT_FOUND');
+    }
+    
+    // Remove credentials from response
+    const { credentials, ...safeIntegration } = integration;
+    
+    const response: APIResponse = {
+      success: true,
+      data: safeIntegration
+    };
+    
+    res.json(response);
+  })
+);
 
-  const { id } = req.params;
-  const updates = req.body;
-  
-  const integration = await updateIntegration(parseInt(id), updates);
-  
-  if (!integration) {
-    throw new APIError(404, 'Integration not found', 'NOT_FOUND');
-  }
-  
-  const response: APIResponse = {
-    success: true,
-    data: integration
-  };
-  
-  res.json(response);
-}));
-
-router.delete('/integrations/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
-  if (!req.user) {
-    throw new APIError(401, 'User not authenticated', 'UNAUTHORIZED');
-  }
-
-  const { id } = req.params;
-  await removeIntegration(parseInt(id));
-  
-  const response: APIResponse = {
-    success: true,
-    data: { message: 'Integration removed successfully' }
-  };
-  
-  res.json(response);
-}));
+router.delete('/integrations/:id',
+  validateParams(idSchema),
+  checkResourceOwnership('integration'),
+  asyncHandler(async (req: AuthenticatedRequest, res) => {
+    const { id } = req.params;
+    await storage.deleteIntegration(id);
+    
+    const response: APIResponse = {
+      success: true,
+      data: { message: 'Integration removed successfully' }
+    };
+    
+    res.json(response);
+  })
+);
 
 export default router;
