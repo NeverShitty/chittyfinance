@@ -18,10 +18,10 @@ export default function Login() {
         <div className="text-center mb-8">
           <img 
             src="/assets/SERVICES.png" 
-            alt="Chitty Services Logo" 
+            alt="ChittyFinance Logo" 
             className="h-16 w-auto mx-auto mb-4"
           />
-          <h1 className="text-3xl font-bold gradient-text mb-2">Chitty Services</h1>
+          <h1 className="text-3xl font-bold gradient-text mb-2">ChittyFinance</h1>
           <p className="text-zinc-400">AI-Powered CFO Assistant</p>
         </div>
         
@@ -69,7 +69,7 @@ export default function Login() {
             <div className="text-center">
               <Button variant="link" className="text-xs text-lime-400 hover:text-lime-500" asChild>
                 <a href="https://nevershitty.com" target="_blank" rel="noopener noreferrer">
-                  Powered by Chitty Services <ExternalLink className="ml-1 h-3 w-3" />
+                  Powered by ChittyFinance <ExternalLink className="ml-1 h-3 w-3" />
                 </a>
               </Button>
             </div>

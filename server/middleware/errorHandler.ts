@@ -19,13 +19,23 @@ export function errorHandler(
   res: Response,
   next: NextFunction
 ) {
-  console.error('Error:', {
+  // Create sanitized error log (no sensitive data)
+  const errorLog = {
     name: err.name,
     message: err.message,
-    stack: err.stack,
     url: req.url,
-    method: req.method
-  });
+    method: req.method,
+    timestamp: new Date().toISOString(),
+    userAgent: req.get('User-Agent'),
+    ip: req.ip
+  };
+
+  // Only include stack trace in development
+  if (process.env.NODE_ENV === 'development') {
+    errorLog.stack = err.stack;
+  }
+
+  console.error('Error:', errorLog);
 
   // Handle Zod validation errors
   if (err instanceof ZodError) {

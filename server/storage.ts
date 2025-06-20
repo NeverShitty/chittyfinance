@@ -8,6 +8,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
+import { hashPassword, encryptCredentials, decryptCredentials } from "./lib/crypto";
 
 export interface IStorage {
   // User operations
@@ -61,9 +62,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
+    // Hash password if provided
+    const userData = { ...insertUser };
+    if (userData.password) {
+      userData.password = await hashPassword(userData.password);
+    }
+    
     const [user] = await db
       .insert(users)
-      .values(insertUser)
+      .values(userData)
       .returning();
     return user;
   }
@@ -79,10 +86,40 @@ export class DatabaseStorage implements IStorage {
 
   // Integration operations
   async getIntegrations(userId: number): Promise<Integration[]> {
-    return await db
+    const results = await db
       .select()
       .from(integrations)
       .where(eq(integrations.userId, userId));
+    
+    // Decrypt credentials for internal use (but don't expose them via API)
+    return results.map(integration => ({
+      ...integration,
+      credentials: this.decryptIntegrationCredentials(integration.credentials)
+    }));
+  }
+  
+  async getIntegrationsForAPI(userId: number): Promise<Omit<Integration, 'credentials'>[]> {
+    const results = await db
+      .select()
+      .from(integrations)
+      .where(eq(integrations.userId, userId));
+    
+    // Remove credentials from API response for security
+    return results.map(({ credentials, ...integration }) => integration);
+  }
+  
+  private decryptIntegrationCredentials(credentials: any): Record<string, any> {
+    if (!credentials) return {};
+    
+    try {
+      if (credentials.encrypted) {
+        return decryptCredentials(credentials.encrypted);
+      }
+      return credentials;
+    } catch (error) {
+      console.error('Failed to decrypt credentials:', error);
+      return {};
+    }
   }
 
   async getIntegration(id: number): Promise<Integration | undefined> {
@@ -94,9 +131,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createIntegration(insertIntegration: InsertIntegration): Promise<Integration> {
+    // Encrypt credentials if provided
+    const integrationData = { ...insertIntegration };
+    if (integrationData.credentials && Object.keys(integrationData.credentials).length > 0) {
+      integrationData.credentials = { encrypted: encryptCredentials(integrationData.credentials) };
+    }
+    
     const [integration] = await db
       .insert(integrations)
-      .values(insertIntegration)
+      .values(integrationData)
       .returning();
     return integration;
   }
@@ -170,6 +213,14 @@ export class DatabaseStorage implements IStorage {
       .values(insertTransaction)
       .returning();
     return transaction;
+  }
+
+  async getTransaction(id: number): Promise<Transaction | undefined> {
+    const [transaction] = await db
+      .select()
+      .from(transactions)
+      .where(eq(transactions.id, id));
+    return transaction || undefined;
   }
 
   // Task operations

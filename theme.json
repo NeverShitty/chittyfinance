@@ -1,7 +1,9 @@
 
 {
-  "variant": "vibrant",
-  "primary": "hsl(265, 84%, 50%)",
+  "variant": "luxury",
+  "primary": "hsl(158, 64%, 52%)",
+  "secondary": "hsl(215, 28%, 17%)",
+  "accent": "hsl(43, 96%, 56%)",
   "appearance": "dark",
-  "radius": 1.0
+  "radius": 1.2
 }
