@@ -86,6 +86,24 @@ export default function ChargeAutomation() {
     setSelectedCharge(charge);
     setIsDialogOpen(true);
   };
+
+  const handleApplyRecommendation = (recommendation: OptimizationRecommendation) => {
+    toast({
+      title: "Recommendation Applied",
+      description: `${recommendation.actionType} recommendation has been applied. You'll see the changes in your next billing cycle.`,
+    });
+    // In a real implementation, this would make an API call
+    queryClient.invalidateQueries({ queryKey: ['/api/charges/optimizations'] });
+  };
+
+  const handleIgnoreRecommendation = (recommendation: OptimizationRecommendation) => {
+    toast({
+      title: "Recommendation Ignored",
+      description: "This recommendation has been dismissed and won't be shown again.",
+    });
+    // In a real implementation, this would mark the recommendation as ignored
+    queryClient.invalidateQueries({ queryKey: ['/api/charges/optimizations'] });
+  };
   
   const confirmCancelSubscription = () => {
     if (selectedCharge) {
@@ -264,6 +282,7 @@ export default function ChargeAutomation() {
                         variant="default" 
                         size="sm"
                         className="mr-2 bg-lime-400 text-black hover:bg-lime-500"
+                        onClick={() => handleApplyRecommendation(optimization)}
                       >
                         <CheckCircle className="h-4 w-4 mr-1" />
                         Apply Recommendation
@@ -272,6 +291,7 @@ export default function ChargeAutomation() {
                         variant="outline" 
                         size="sm"
                         className="border-zinc-600 text-zinc-300 hover:bg-zinc-700"
+                        onClick={() => handleIgnoreRecommendation(optimization)}
                       >
                         Ignore
                       </Button>

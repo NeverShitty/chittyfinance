@@ -7,8 +7,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { apiRequest } from "@/lib/queryClient";
 import { getPriorityClass, getLabelForPriority } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { useLocation } from "wouter";
 
 export default function FinancialTasks() {
+  const [, setLocation] = useLocation();
+  
   const { data: tasks, isLoading } = useQuery<Task[]>({
     queryKey: ["/api/tasks", { limit: 3 }],
   });
@@ -48,6 +51,7 @@ export default function FinancialTasks() {
           <Button 
             variant="outline" 
             className="w-full border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+            onClick={() => setLocation('/tasks')}
           >
             View All Tasks
           </Button>
@@ -80,15 +84,15 @@ function TaskItem({ task }: TaskItemProps) {
     toggleTaskMutation.mutate(task.id);
   };
 
-  const priorityClass = getPriorityClass(task.priority);
-  const priorityLabel = getLabelForPriority(task.priority);
+  const priorityClass = getPriorityClass(task.priority ?? undefined);
+  const priorityLabel = getLabelForPriority(task.priority ?? undefined);
 
   return (
     <li className={`py-4 ${task.completed ? 'opacity-60' : ''}`}>
       <div className="flex items-start">
         <div className="flex-shrink-0 pt-1">
           <Checkbox 
-            checked={task.completed} 
+            checked={task.completed ?? false} 
             onCheckedChange={handleToggleTask}
             disabled={toggleTaskMutation.isPending}
           />

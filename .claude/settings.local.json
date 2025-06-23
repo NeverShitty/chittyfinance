@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run check:*)",
+      "Bash(npm run build:*)",
+      "Bash(chmod:*)",
+      "Bash(ls:*)",
+      "Bash(curl:*)",
+      "Bash(unzip:*)",
+      "Bash(./op:*)",
+      "Bash(tar:*)",
+      "Bash(grep:*)",
+      "Bash(npm install:*)",
+      "Bash(python3:*)",
+      "Bash(node:*)",
+      "Bash(npm audit:*)",
+      "Bash(docker build:*)",
+      "Bash(find:*)",
+      "Bash(rg:*)",
+      "Bash(rm:*)",
+      "Bash(./debug-1password.sh:*)",
+      "Bash(export:*)",
+      "Bash(./connect-mercury.sh:*)",
+      "Bash(npx tsc:*)",
+      "Bash(timeout 10s npm run dev)",
+      "Bash(npm run dev:*)"
+    ],
+    "deny": []
+  }
+}
