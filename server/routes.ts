@@ -6,9 +6,6 @@ import { insertAiMessageSchema, insertIntegrationSchema, insertTaskSchema } from
 import { getFinancialAdvice, generateCostReductionPlan } from "./lib/openai";
 import { getAggregatedFinancialData } from "./lib/financialServices";
 import { getRecurringCharges, getChargeOptimizations, manageRecurringCharge } from "./lib/chargeAutomation";
-import { financialSummaryService } from "./lib/services/FinancialSummaryService";
-import { integrationService } from "./lib/services/IntegrationService";
-import { errorHandler } from "./lib/services/ErrorHandlingService";
 import { 
   fetchUserRepositories, 
   fetchRepositoryCommits, 
@@ -37,12 +34,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get financial summary
   api.get("/financial-summary", async (req: Request, res: Response) => {
+    // In a real app, we would get the user ID from the session
     const user = await storage.getUserByUsername("demo");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-<<<<<<< Updated upstream
     // Get financial summary
     let summary = await storage.getFinancialSummary(user.id);
 
@@ -59,12 +56,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     res.json(summary);
-=======
-    await errorHandler.withErrorHandling(
-      () => financialSummaryService.getFinancialSummary(user),
-      res
-    );
->>>>>>> Stashed changes
   });
 
   // Get integrations
@@ -74,10 +65,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(404).json({ message: "User not found" });
     }
 
-    await errorHandler.withErrorHandling(
-      () => integrationService.getIntegrations(user),
-      res
-    );
+    const integrations = await storage.getIntegrations(user.id);
+    res.json(integrations);
   });
 
   // Create or update integration

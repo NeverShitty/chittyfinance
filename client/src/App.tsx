@@ -5,13 +5,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { useEffect, useState } from "react";
 import Dashboard from "@/pages/Dashboard";
 import Settings from "@/pages/Settings";
-<<<<<<< Updated upstream
-=======
-import Tasks from "@/pages/Tasks";
-import TransactionsV2 from "@/pages/TransactionsV2";
-import Login from "@/pages/Login";
-import ConnectAccounts from "@/pages/ConnectAccounts";
->>>>>>> Stashed changes
 import NotFound from "@/pages/not-found";
 import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
@@ -29,8 +22,6 @@ function Router() {
         <main className="flex-1 relative overflow-y-auto focus:outline-none">
           <Switch>
             <Route path="/" component={Dashboard} />
-            <Route path="/tasks" component={Tasks} />
-            <Route path="/transactions-v2" component={TransactionsV2} />
             <Route path="/settings" component={Settings} />
             <Route component={NotFound} />
           </Switch>

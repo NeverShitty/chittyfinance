@@ -71,17 +71,6 @@ export function getServiceIcon(serviceType: string): React.ReactNode {
     'mercury_bank': 'M',
     'wavapps': 'W',
     'doorloop': 'D',
-<<<<<<< Updated upstream
-=======
-    'stripe': 'S',
-    'quickbooks': 'Q',
-    'xero': 'X',
-    'brex': 'B',
-    'gusto': 'G',
-    'github': 'G',
-    'zapier': 'Z',
-    'plaid': 'P',
->>>>>>> Stashed changes
   };
   
   return iconMap[serviceType] || serviceType.charAt(0).toUpperCase();
@@ -93,17 +82,6 @@ export function getServiceColor(serviceType: string): string {
     'mercury_bank': 'bg-blue-500',
     'wavapps': 'bg-teal-500',
     'doorloop': 'bg-orange-500',
-<<<<<<< Updated upstream
-=======
-    'stripe': 'bg-purple-500',
-    'quickbooks': 'bg-green-500',
-    'xero': 'bg-blue-400',
-    'brex': 'bg-indigo-500',
-    'gusto': 'bg-pink-500',
-    'github': 'bg-gray-800',
-    'zapier': 'bg-orange-600',
-    'plaid': 'bg-blue-600',
->>>>>>> Stashed changes
   };
 
   return colorMap[serviceType] || 'bg-gray-500';
