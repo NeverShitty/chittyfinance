@@ -9,6 +9,7 @@ import NotFound from "@/pages/not-found";
 import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
 import { User } from "@shared/schema";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 function Router() {
   const [location] = useLocation();
@@ -60,7 +61,9 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Router />
+      <ThemeProvider>
+        <Router />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

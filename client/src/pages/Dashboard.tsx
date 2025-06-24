@@ -20,13 +20,13 @@ export default function Dashboard() {
       {/* Page Header */}
       <div className="px-4 sm:px-6 md:px-8">
         <h1 className="text-3xl font-bold gradient-text">
-          Chitty Services CFO Dashboard
+          ChittyFinance Dashboard
         </h1>
         
-        <div className="mt-2 flex items-center text-sm text-zinc-400">
+        <div className="mt-2 flex items-center text-sm text-muted-foreground">
           {/* AI Assistant Status */}
           <div className="flex items-center">
-            <div className="h-2.5 w-2.5 rounded-full bg-lime-400 pulse-connection mr-1.5"></div>
+            <div className="h-2.5 w-2.5 rounded-full bg-orange-500 dark:bg-orange-400 pulse-connection mr-1.5"></div>
             <span>AI CFO Assistant Active</span>
           </div>
           <span className="mx-2">•</span>
