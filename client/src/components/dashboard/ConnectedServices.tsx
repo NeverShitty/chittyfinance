@@ -38,7 +38,7 @@ export default function ConnectedServices() {
         <div className="mt-6">
           <Button variant="outline" className="text-primary bg-primary/10 hover:bg-primary/20 border-transparent">
             <Plus className="mr-2 -ml-1 h-5 w-5" />
-            Connect New Service
+            Hook Up More Sh*t
           </Button>
         </div>
       </CardContent>
@@ -90,7 +90,7 @@ function ServiceCard({ integration }: ServiceCardProps) {
       </div>
       <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 text-right">
         <Button variant="link" className="text-xs font-medium text-primary hover:text-primary-dark p-0 h-auto">
-          Configure
+          Tweak This
         </Button>
       </div>
     </div>

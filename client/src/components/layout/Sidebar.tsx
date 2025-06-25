@@ -66,8 +66,8 @@ export default function Sidebar() {
               <span className="text-white font-bold text-xl">C</span>
             </div>
             <div className="ml-2">
-              <h2 className="text-lg font-bold gradient-text">ChittyFinance</h2>
-              <p className="text-xs text-muted-foreground">Never Sh*tty™</p>
+              <h2 className="text-lg font-bold gradient-text">Claudefo</h2>
+              <p className="text-xs text-muted-foreground">AI-Powered Financial Operations</p>
             </div>
           </div>
           
@@ -110,7 +110,7 @@ export default function Sidebar() {
                   <p className="text-sm font-medium text-foreground">
                     {user.displayName}
                   </p>
-                  <p className="text-xs chitty-orange">
+                  <p className="text-xs claudefo-orange">
                     {user.role}
                   </p>
                 </div>

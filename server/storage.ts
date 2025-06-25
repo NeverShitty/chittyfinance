@@ -125,17 +125,17 @@ export class DatabaseStorage implements IStorage {
 
   // Transaction operations
   async getTransactions(userId: number, limit?: number): Promise<Transaction[]> {
-    let query = db
+    const baseQuery = db
       .select()
       .from(transactions)
       .where(eq(transactions.userId, userId))
       .orderBy(desc(transactions.date));
 
     if (limit) {
-      query = query.limit(limit);
+      return await baseQuery.limit(limit);
     }
 
-    return await query;
+    return await baseQuery;
   }
 
   async createTransaction(insertTransaction: InsertTransaction): Promise<Transaction> {
@@ -149,22 +149,17 @@ export class DatabaseStorage implements IStorage {
   // Task operations
   async getTasks(userId: number, limit?: number): Promise<Task[]> {
     // Start building the query
-    let query = db
+    const baseQuery = db
       .select()
       .from(tasks)
-      .where(eq(tasks.userId, userId));
-
-    // Custom ordering (we'll order by multiple columns)
-    // 1. Completed tasks go last
-    // 2. Due date (earliest first)
-    query = query.orderBy(tasks.completed, tasks.dueDate);
-
-    if (limit) {
-      query = query.limit(limit);
-    }
+      .where(eq(tasks.userId, userId))
+      // Custom ordering (we'll order by multiple columns)
+      // 1. Completed tasks go last
+      // 2. Due date (earliest first)
+      .orderBy(tasks.completed, tasks.dueDate);
 
     // Execute query
-    const taskResults = await query;
+    const taskResults = limit ? await baseQuery.limit(limit) : await baseQuery;
 
     // Apply additional sorting for priority since SQL can't easily handle custom enum ordering
     return taskResults.sort((a, b) => {
@@ -206,17 +201,17 @@ export class DatabaseStorage implements IStorage {
 
   // AI Message operations
   async getAiMessages(userId: number, limit?: number): Promise<AiMessage[]> {
-    let query = db
+    const baseQuery = db
       .select()
       .from(aiMessages)
       .where(eq(aiMessages.userId, userId))
       .orderBy(desc(aiMessages.timestamp));
 
     if (limit) {
-      query = query.limit(limit);
+      return await baseQuery.limit(limit);
     }
 
-    return await query;
+    return await baseQuery;
   }
 
   async createAiMessage(insertMessage: InsertAiMessage): Promise<AiMessage> {

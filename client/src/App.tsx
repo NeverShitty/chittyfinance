@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { useEffect, useState } from "react";
 import Dashboard from "@/pages/Dashboard";
 import Settings from "@/pages/Settings";
+import Landing from "@/pages/Landing";
 import NotFound from "@/pages/not-found";
 import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
@@ -13,7 +14,19 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 
 function Router() {
   const [location] = useLocation();
-  const showSidebar = location !== "/login" && location !== "/register";
+  const showSidebar = location !== "/login" && location !== "/register" && location !== "/landing";
+  const isLandingPage = location === "/landing";
+
+  if (isLandingPage) {
+    return (
+      <>
+        <Switch>
+          <Route path="/landing" component={Landing} />
+        </Switch>
+        <Toaster />
+      </>
+    );
+  }
 
   return (
     <div className="flex h-screen overflow-hidden">

@@ -16,7 +16,7 @@ export default function Header() {
               <span className="text-white font-bold text-xl">C</span>
             </div>
             <div className="ml-2">
-              <span className="text-lg font-bold gradient-text">ChittyFinance</span>
+              <span className="text-lg font-bold gradient-text">Claudefo</span>
             </div>
           </div>
           

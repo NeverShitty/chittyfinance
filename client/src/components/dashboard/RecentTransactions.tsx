@@ -37,7 +37,7 @@ export default function RecentTransactions() {
           ) : (
             // Empty state
             <li className="py-4 text-center text-gray-500 dark:text-gray-400">
-              No recent transactions
+              No transactions yet. Your money is just chilling 😎
             </li>
           )}
         </ul>
@@ -47,7 +47,7 @@ export default function RecentTransactions() {
             variant="outline" 
             className="w-full border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
           >
-            View All Transactions
+            See All The Money Moves
           </Button>
         </div>
       </CardContent>
@@ -84,7 +84,7 @@ function TransactionItem({ transaction }: TransactionItemProps) {
         </div>
         <div>
           <div className={`inline-flex items-center text-base font-semibold font-mono ${
-            isIncome ? 'text-green-500' : 'text-red-500'
+            isIncome ? 'text-orange-500 dark:text-orange-400' : 'text-red-500'
           }`}>
             {formatCurrency(transaction.amount)}
           </div>

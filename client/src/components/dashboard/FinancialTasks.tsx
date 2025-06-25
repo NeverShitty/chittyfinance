@@ -39,7 +39,7 @@ export default function FinancialTasks() {
           ) : (
             // Empty state
             <li className="py-4 text-center text-gray-500 dark:text-gray-400">
-              No tasks found
+              No tasks! You're killing it! 🎉
             </li>
           )}
         </ul>
@@ -49,7 +49,7 @@ export default function FinancialTasks() {
             variant="outline" 
             className="w-full border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
           >
-            View All Tasks
+            See What Else Needs Un-sh*ttying
           </Button>
         </div>
       </CardContent>
@@ -80,15 +80,15 @@ function TaskItem({ task }: TaskItemProps) {
     toggleTaskMutation.mutate(task.id);
   };
 
-  const priorityClass = getPriorityClass(task.priority);
-  const priorityLabel = getLabelForPriority(task.priority);
+  const priorityClass = getPriorityClass(task.priority ?? undefined);
+  const priorityLabel = getLabelForPriority(task.priority ?? undefined);
 
   return (
     <li className={`py-4 ${task.completed ? 'opacity-60' : ''}`}>
       <div className="flex items-start">
         <div className="flex-shrink-0 pt-1">
           <Checkbox 
-            checked={task.completed} 
+            checked={task.completed ?? false} 
             onCheckedChange={handleToggleTask}
             disabled={toggleTaskMutation.isPending}
           />
