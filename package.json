@@ -4,11 +4,20 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "dev": "NODE_ENV=development tsx server/index.ts",
-    "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "dev": "node scripts/detect-mode.js && npm run dev:detected",
+    "dev:standalone": "MODE=standalone NODE_ENV=development tsx server/index.ts",
+    "dev:system": "MODE=system NODE_ENV=development tsx server/index.ts",
+    "build": "npm run build:both",
+    "build:standalone": "MODE=standalone vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist/standalone",
+    "build:system": "MODE=system vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist/system",
+    "build:both": "npm run build:standalone && npm run build:system",
     "start": "NODE_ENV=production node dist/index.js",
+    "deploy:standalone": "NODE_ENV=production MODE=standalone node dist/standalone/index.js",
+    "deploy:system": "wrangler deploy --config deploy/system-wrangler.toml",
     "check": "tsc",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "mode:detect": "node scripts/detect-mode.js",
+    "mode:setup": "node scripts/setup-mode.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
